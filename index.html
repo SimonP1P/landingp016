@@ -1,0 +1,1356 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Seiton Studio – Werkzeuge digitalisieren. Shadowboards standardisieren.</title>
+<meta name="description" content="Seiton Studio digitalisiert Werkzeuge maßhaltig, verwaltet sie in einer Bibliothek und macht daraus standardisierte Shadowboards – als DXF für Ihre Fräse oder gefräst von Seiton Boards.">
+<meta name="theme-color" content="#0F1117">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Crect width='34' height='34' rx='6' fill='%234F8EF7'/%3E%3Cg transform='rotate%28-35 17 17%29'%3E%3Cpath fill='%230F1117' fill-rule='evenodd' d='M4.3 15.3H9A1.7 1.7 0 0 1 9 18.7H4.3A5 5 0 0 0 13.58 19L22.21 18.8A4.2 4.2 0 1 0 22.21 15.2L13.58 15A5 5 0 0 0 4.3 15.3ZM27.8 17A1.8 1.8 0 1 0 24.2 17A1.8 1.8 0 1 0 27.8 17Z'/%3E%3Crect x='15.6' y='10.5' width='3.6' height='13' rx='1.8' fill='%2338BDF8'/%3E%3C/g%3E%3C/svg%3E">
+<style>
+/* Archivo, lokal ausgeliefert (SIL Open Font License, fonts/OFL.txt) – kein Nachladen von Google */
+@font-face{font-family:"Archivo";font-style:normal;font-weight:300 900;font-stretch:62% 125%;font-display:swap;src:url(fonts/archivo-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Archivo";font-style:normal;font-weight:300 900;font-stretch:62% 125%;font-display:swap;src:url(fonts/archivo-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+:root{
+  --bg:#0F1117; --panel:#1A1D27; --border:#2A2D3E; --selected:#1E2235;
+  --accent:#4F8EF7; --accent2:#38BDF8;
+  --success:#22C55E; --warning:#F59E0B; --error:#EF4444;
+  --text:#E2E8F0; --muted:#64748B; --muted-light:#94A3B8; --white:#FFFFFF;
+  --d1:#4F8EF7; --d2:#3E6CC4; --d3:#2F4F8F;
+  --display:"Archivo","Segoe UI",system-ui,sans-serif;
+  --font:"Segoe UI","Archivo",system-ui,-apple-system,sans-serif;
+  --mono:"SF Mono",Menlo,"Cascadia Mono",Consolas,"Liberation Mono",monospace;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  box-sizing:border-box;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{background:var(--bg);scroll-behavior:smooth;scroll-padding-top:calc(env(safe-area-inset-top,0px) + 70px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;padding-bottom:env(safe-area-inset-bottom,0px)}
+svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent2);outline-offset:3px}
+p{margin:0}
+h1,h2,h3{margin:0;font-family:var(--display);font-weight:800;line-height:.9;letter-spacing:-.02em}
+.wrap{max-width:1320px;margin:0 auto;padding:0 28px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}html{scroll-behavior:auto}}
+
+/* ---------- Kopfleiste wie die App ---------- */
+.top{position:sticky;top:0;z-index:50;background:rgba(15,17,23,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding-top:env(safe-area-inset-top,0px)}
+.top .wrap{display:flex;align-items:stretch;justify-content:space-between;height:62px;gap:20px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:21px;font-stretch:85%;letter-spacing:.01em}
+.logo small{font-weight:500;color:var(--muted-light);font-size:15px;font-stretch:100%;letter-spacing:.04em}
+.tabs{display:flex;align-items:stretch}
+.tabs a{display:flex;align-items:center;gap:8px;padding:0 15px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-light);border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+.tabs a:hover,.tabs a.on{color:var(--text);border-bottom-color:var(--accent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:46px;padding:0 20px;border-radius:6px;border:0;background:var(--accent);color:var(--white);font-weight:700;font-size:16px;cursor:pointer;transition:background .15s, transform .15s}
+.btn:hover{background:#6FA2F9}
+.btn:active{transform:translateY(1px)}
+.btn.sec{background:var(--border);color:var(--text)}
+.btn.sec:hover{background:#363A50}
+.btn[disabled]{background:var(--border);color:var(--muted);cursor:not-allowed}
+.top .btn{align-self:center}
+
+/* Segmentschalter wie in der App */
+.seg{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;border:1px solid var(--border);border-radius:8px;background:var(--panel)}
+.seg button{border:0;background:transparent;border-radius:5px;padding:10px 16px;font-size:15px;font-weight:600;color:var(--muted-light);cursor:pointer;transition:background .2s,color .2s}
+.seg button:hover{color:var(--text)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--white)}
+.est{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:1px 5px;vertical-align:middle;white-space:nowrap}
+
+/* ---------- HERO ---------- */
+.hero{padding:40px 0 0}
+.h-title{font-size:clamp(56px,11.6vw,176px);font-stretch:62%;font-weight:850;margin-top:10px}
+.h-title .r{display:block;text-align:right}
+.h-title .l{display:block}
+.h-title .blue{color:var(--accent)}
+.hero-row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr) auto;gap:40px;align-items:end;margin-top:34px}
+.hero-row p{font-size:20px;color:#C3CCD8;max-width:34em}
+.less{display:grid;gap:4px;font-family:var(--display);font-stretch:80%;font-weight:700;font-size:24px;line-height:1.15}
+.less span{color:var(--muted-light)}
+.less span b{color:var(--text);font-weight:700}
+.hero-cta{display:flex;flex-direction:column;gap:10px}
+
+/* Spielfläche */
+.play{margin-top:56px;border:1px solid var(--border);border-radius:10px;background:var(--panel);overflow:hidden}
+.play-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.play-bar .hint{display:flex;align-items:center;gap:10px;font-size:15px}
+.play-bar .hint .dot{width:10px;height:10px;border-radius:50%;background:var(--accent2);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:12px;color:var(--muted-light)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:11px;height:11px;border-radius:2px;display:inline-block}
+.play-body{display:grid;grid-template-columns:minmax(0,1fr) 290px}
+.board-wrap{padding:18px;background-color:var(--bg);background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:30px 30px;touch-action:none}
+#board{width:100%;height:auto;user-select:none;-webkit-user-select:none}
+#board .tool{cursor:grab;outline:none}
+#board .tool.drag{cursor:grabbing}
+#board.anim .tool{transition:transform .7s var(--ease)}
+#board .bbox{fill:none;stroke:transparent;stroke-width:2;transition:stroke .15s, fill .15s}
+#board .tool:hover .bbox,#board .tool:focus-visible .bbox{stroke:var(--accent)}
+#board .tool.drag .bbox{stroke:var(--accent);fill:rgba(79,142,247,.08)}
+#board .st-close .bbox{stroke:var(--warning)}
+#board .st-edge .bbox{stroke:var(--warning);stroke-dasharray:6 5}
+#board .st-overlap .bbox{stroke:var(--error);fill:rgba(239,68,68,.14)}
+#engrText{cursor:move;outline:none}
+#engrText rect{fill:transparent}
+#engrText path{fill:none;stroke:#94A3B8;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:stroke .15s}
+#engrText:hover path,#engrText:focus-visible path,#engrText.drag path{stroke:var(--accent2)}
+.engrave-in small{display:block;margin-top:2px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)}
+.engrave-in{display:grid;gap:6px;margin:2px 0 12px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.engrave-in input{height:44px;min-width:0;padding:0 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);font-family:var(--mono);font-size:15px;letter-spacing:.08em;text-transform:uppercase;outline:none;transition:border-color .2s}
+.engrave-in input:focus,.engrave-in.typing input{border-color:var(--accent2)}
+.engrave-in input::placeholder{color:var(--muted);text-transform:none;letter-spacing:0}
+#board .engr{font-family:var(--mono);font-size:11px;letter-spacing:.12em;fill:none;stroke:#64748B;stroke-width:.6;pointer-events:none}
+.panel{border-left:1px solid var(--border);padding:18px;display:flex;flex-direction:column;gap:4px}
+.panel h4{margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.chk{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border);font-size:15px}
+.chk b{font-family:var(--mono);font-weight:400;font-size:14px}
+.good{color:var(--success)}.warnc{color:var(--warning)}.bad{color:var(--error)}
+.status{margin:12px 0;padding:12px;border-radius:6px;background:var(--selected);font-size:14px;min-height:48px}
+.panel .btn{width:100%}
+.panel .btn+.btn{margin-top:8px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 28px);transform:translate(-50%,20px);opacity:0;z-index:95;padding:14px 20px;border-radius:8px;background:var(--success);color:var(--bg);font-weight:700;transition:opacity .25s, transform .25s;pointer-events:none;max-width:calc(100vw - 32px)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- Abschnitte ---------- */
+section.s{padding:140px 0 0}
+.s-title{font-size:clamp(44px,7vw,110px);font-stretch:62%;margin:0;max-width:14ch}
+.s-lead{font-size:20px;color:#C3CCD8;max-width:36em;margin-top:24px}
+
+/* ---------- Prozesskette: zehn Schritte fließen zusammen ---------- */
+.flow-ctrl{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;margin-top:44px}
+.mill{display:inline-flex;align-items:center;gap:12px;cursor:pointer;font-size:15px;color:var(--muted-light);user-select:none}
+.mill input{position:absolute;opacity:0;pointer-events:none}
+.mill .sw{position:relative;width:46px;height:26px;border-radius:13px;background:var(--border);transition:background .2s;flex:none}
+.mill .sw::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:var(--muted-light);transition:transform .25s var(--ease),background .2s}
+.mill input:checked+.sw{background:var(--accent2)}
+.mill input:checked+.sw::after{transform:translateX(20px);background:var(--bg)}
+.mill input:focus-visible+.sw{outline:2px solid var(--accent2);outline-offset:3px}
+.flow{position:relative;margin-top:30px;border:1px solid var(--border);border-radius:10px;background:var(--panel);padding:34px 20px 26px;overflow:hidden}
+.rail{position:absolute;left:36px;right:36px;top:78px;height:2px;background:var(--border)}
+.rail i{position:absolute;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--accent2);box-shadow:0 0 12px var(--accent2);animation:run 3.2s linear infinite;opacity:.9}
+@keyframes run{from{left:0}to{left:calc(100% - 10px)}}
+.chain2{position:relative;display:flex;justify-content:center;list-style:none;margin:0;padding:0}
+.stp{position:relative;flex:1 1 0;min-width:0;max-width:240px;padding:0 6px;transition:flex-grow .7s var(--ease),max-width .7s var(--ease),padding .7s var(--ease),opacity .45s ease}
+.stp .no{display:flex;align-items:center;justify-content:center;width:38px;height:38px;margin:0 auto;border-radius:50%;background:var(--bg);border:2px solid var(--muted);font-family:var(--mono);font-size:13px;color:var(--muted-light);position:relative;z-index:1;transition:all .35s}
+.stp .lb{display:block;margin-top:16px;text-align:center;font-family:var(--display);font-stretch:75%;font-weight:700;font-size:clamp(15px,1.35vw,19px);line-height:1.15;color:var(--text);position:relative;transition:color .3s}
+.stp .lb::after{content:"";position:absolute;left:8%;top:50%;height:2px;width:0;background:var(--error);transition:width .45s ease}
+.stp .why{display:block;margin-top:8px;text-align:center;font-size:12px;color:var(--accent2);opacity:0;transform:translateY(-4px);transition:opacity .3s,transform .3s;min-height:1.3em}
+.stp.cut .lb{color:var(--muted)}
+.stp.cut .lb::after{width:84%}
+.stp.cut .no{border-color:var(--error);color:var(--error)}
+.stp.cut .why{opacity:1;transform:none;color:var(--muted-light)}
+.stp.kept .no{border-color:var(--accent);background:var(--accent);color:var(--white)}
+.stp.new .no{border-color:var(--accent2);background:var(--accent2);color:var(--bg)}
+.stp.new .lb{color:var(--accent2)}
+.stp.help .why{opacity:1;transform:none}
+.stp.gone{flex-grow:0;max-width:0;padding:0;opacity:0;pointer-events:none}
+.flow-sum{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:0 40px;align-items:end;margin-top:34px;padding-top:24px;border-top:1px solid var(--border)}
+.flow-sum .big{font-family:var(--display);font-stretch:62%;font-weight:850;font-size:clamp(56px,6.4vw,96px);line-height:.85;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.flow-sum .big small{font-size:.3em;color:var(--muted-light);font-weight:700;margin-left:8px;letter-spacing:0}
+.flow-sum p{font-size:16px;color:var(--muted-light);align-self:center}
+.flow-sum p b{color:var(--text)}
+
+/* Digitalisieren */
+.dig{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:28px;margin-top:52px}
+.dig-stage{position:relative;border:1px solid var(--border);border-radius:10px;background:var(--panel);overflow:hidden;aspect-ratio:600/380}
+.photo{position:absolute;inset:0;transform:perspective(900px) rotateX(26deg) rotateZ(-7deg) scale(.82) translateY(18px);transition:transform 1s var(--ease), opacity .6s}
+.dig-stage.s1 .photo{transform:none}
+.dig-stage.s3 .photo{opacity:.3}
+.overlay{position:absolute;inset:0}
+.scan{opacity:0}
+.dig-stage.s2 .scan{animation:scan 1.2s ease-in-out forwards}
+@keyframes scan{0%{opacity:1;transform:translateY(0)}90%{opacity:1}100%{opacity:0;transform:translateY(360px)}}
+.draw{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-dasharray:1;stroke-dashoffset:1}
+.dig-stage.s3 .draw{transition:stroke-dashoffset 1.2s ease;stroke-dashoffset:0}
+.node,.fade{opacity:0;transition:opacity .4s}
+.dig-stage.s4 .node,.dig-stage.s4 .fade{opacity:1}
+.dig-side{display:flex;flex-direction:column;gap:14px}
+.timer{font-family:var(--display);font-stretch:62%;font-weight:850;font-size:clamp(90px,10vw,150px);line-height:.85;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.timer small{font-size:.35em;color:var(--muted-light);font-weight:700;margin-left:6px}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.steps li{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:6px;font-size:15px;color:var(--muted-light);transition:all .3s}
+.steps li i{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex:none;transition:all .3s}
+.steps li.act{color:var(--text);border-color:var(--accent)}
+.steps li.act i{border-color:var(--accent);border-top-color:transparent;animation:spin .8s linear infinite}
+.steps li.done{color:var(--text)}
+.steps li.done i{background:var(--success);border-color:var(--success)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.note{font-size:14px;color:var(--muted-light)}
+.ways{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:20px}
+.way{border:1px solid var(--border);border-radius:10px;padding:20px;background:transparent;text-align:left;cursor:pointer;transition:border-color .2s,background .2s}
+.way:hover,.way.on{border-color:var(--accent);background:var(--selected)}
+.way span{font-family:var(--mono);font-size:12px;color:var(--accent2)}
+.way b{display:block;margin-top:10px;font-family:var(--display);font-stretch:75%;font-size:26px;line-height:1.05}
+.ways-h{margin-top:64px;font-size:clamp(30px,3.2vw,44px);font-stretch:70%;line-height:1}
+.way-text{margin-top:12px;border:1px solid var(--border);border-radius:10px;background:var(--panel);padding:22px 24px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:18px 40px;align-items:start;min-height:150px}
+.way-text p{font-size:18px;color:#C3CCD8}
+.way-text ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.way-text li{font-size:15px;color:var(--muted-light);padding-left:20px;position:relative}
+.way-text li::before{content:"";position:absolute;left:0;top:.55em;width:8px;height:8px;border-radius:50%;background:var(--accent2)}
+.way-text.swap-in{animation:wayIn .35s var(--ease)}
+@keyframes wayIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* Tiefe: Kavität in 3D */
+.depth{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:28px;margin-top:52px;align-items:stretch}
+.scene{position:relative;border:1px solid var(--border);border-radius:10px;background:radial-gradient(120% 90% at 50% 20%,#1b2030 0%,var(--bg) 70%);overflow:hidden;aspect-ratio:600/420;perspective:1400px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.scene.grab{cursor:grabbing}
+.obj{position:absolute;left:50%;top:46%;width:600px;height:340px;margin:-170px 0 0 -300px;transform-style:preserve-3d;transition:transform .9s var(--ease)}
+.scene.live .obj{transition:none}
+.obj>svg{position:absolute;inset:0;width:600px;height:340px;overflow:visible;backface-visibility:visible}
+.scene-hint{position:absolute;left:14px;bottom:12px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.scene-tag{position:absolute;right:14px;top:12px;display:flex;gap:6px}
+.depth-side{display:flex;flex-direction:column;gap:12px}
+.rg{border:1px solid var(--border);border-radius:8px;padding:14px 16px;background:var(--panel)}
+.rg-h{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:15px}
+.rg-h span{display:flex;align-items:center;gap:10px}
+.rg-h i{width:12px;height:12px;border-radius:2px}
+.rg-h b{font-family:var(--mono);font-weight:400;font-size:14px;color:var(--accent2)}
+.rg input[type=range]{width:100%;margin:12px 0 2px;accent-color:var(--accent)}
+.formula{font-size:14px;color:var(--muted-light);padding:4px 2px}
+.formula b{color:var(--text)}
+
+/* Bibliothek */
+.lib-top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:44px}
+.search{flex:1 1 280px;min-width:0;display:flex;align-items:center;gap:14px;height:64px;padding:0 20px;background:var(--panel);border:2px solid var(--border);border-radius:8px}
+.search:focus-within{border-color:var(--accent)}
+.search input{flex:1;min-width:0;border:0;background:transparent;color:var(--text);font-family:var(--display);font-stretch:80%;font-weight:700;font-size:26px;outline:none}
+.search input::placeholder{color:var(--muted)}
+.chipf{height:48px;padding:0 16px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;font-size:15px;color:var(--muted-light)}
+.chipf.on{background:var(--accent);border-color:var(--accent);color:var(--white);font-weight:700}
+.count{font-family:var(--mono);font-size:13px;color:var(--muted-light);margin-top:14px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:14px}
+.tile{border:1px solid var(--border);border-radius:10px;background:var(--panel);padding:14px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s, transform .2s}
+.tile:hover{border-color:var(--accent);transform:translateY(-2px)}
+.tile .th{height:92px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.tile b{font-size:16px}
+.tile small{display:block;font-size:13px;color:var(--muted-light)}
+.tile .u{align-self:flex-start;font-family:var(--mono);font-size:12px;color:var(--accent2)}
+.tile[hidden]{display:none}
+.empty{display:none;padding:28px;border:1px dashed var(--border);border-radius:10px;color:var(--warning);margin-top:14px}
+.lib-foot{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:22px;font-size:15px;color:var(--muted-light)}
+.lib-foot span::before{content:"";display:inline-block;width:8px;height:8px;margin-right:10px;border-radius:50%;background:var(--accent2);vertical-align:middle}
+
+/* Änderungen */
+.chg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:40px;margin-top:48px;align-items:start}
+.chg-text p{font-size:19px;color:#C3CCD8}
+.chg-ctrl{margin-top:28px;display:flex;flex-wrap:wrap;gap:10px}
+.dlg{margin-top:18px;border:1px solid var(--accent);border-radius:8px;background:var(--panel);padding:20px;display:none}
+.dlg.open{display:block}
+.dlg h4{margin:0;font-size:17px;display:flex;gap:10px;align-items:center}
+.dlg p{font-size:15px;color:var(--muted-light);margin:10px 0 16px}
+.dlg .row{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.dlg .btn{min-height:42px;font-size:15px;padding:0 16px}
+.btn.ghost{background:transparent;color:var(--muted-light)}
+.minis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.mini{position:relative;border:1px solid var(--border);border-radius:8px;background:var(--panel);padding:8px}
+.mini .lbl{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--muted-light);margin-bottom:6px}
+.mini.flash{animation:flash .9s ease}
+@keyframes flash{0%{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(56,189,248,.35)}100%{border-color:var(--border);box-shadow:none}}
+.mini .var{position:absolute;right:8px;bottom:8px;font-size:11px;font-weight:700;padding:2px 6px;border-radius:3px;background:var(--accent2);color:var(--bg)}
+.wr rect,.wr circle{transition:all .6s ease}
+
+/* Export: eigene Fräse oder Seiton Boards */
+.dxf{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;margin-top:40px;align-items:center}
+.big-claim{font-family:var(--display);font-stretch:62%;font-weight:850;font-size:clamp(48px,6vw,92px);line-height:.9}
+.big-claim span{display:block}
+.swap{display:grid}
+.swap>*{grid-area:1/1;transition:opacity .45s ease,transform .6s var(--ease)}
+.swap>.off{opacity:0;transform:translateY(16px);pointer-events:none}
+.layers{border:1px solid var(--border);border-radius:10px;background:var(--panel);overflow:hidden}
+.layers .hd{display:flex;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:16px}
+.layer{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--border);font-size:16px}
+.layer:last-child{border-bottom:0}
+.layer i{width:14px;height:14px;border-radius:2px}
+.layer span:last-child{color:var(--muted-light);font-family:var(--mono);font-size:14px}
+.order{border:1px solid var(--accent2);border-radius:10px;background:var(--panel);overflow:hidden}
+.order .hd{display:flex;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:16px}
+.otrack{list-style:none;margin:0;padding:10px 18px 18px}
+.otrack li{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);font-size:16px;color:var(--muted-light);transition:color .3s}
+.otrack li:last-child{border-bottom:0}
+.otrack li i{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex:none;transition:all .3s}
+.otrack li.done{color:var(--text)}
+.otrack li.done i{background:var(--accent2);border-color:var(--accent2)}
+
+/* Zeit */
+.time{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-top:48px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.time>div{padding:30px;border-right:1px solid var(--border)}
+.time>div:last-child{border-right:0;background:var(--accent);color:var(--bg)}
+.time>div:last-child .lbl{color:var(--bg)}
+.time .clock{font-family:var(--display);font-stretch:62%;font-weight:850;font-size:clamp(64px,7.6vw,118px);line-height:.9;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.time .lbl{font-size:16px;color:var(--muted-light);margin-top:14px}
+.time .old .clock{color:var(--muted);text-decoration:line-through;text-decoration-thickness:4px;text-decoration-color:var(--error)}
+.foot-note{font-size:14px;color:var(--muted-light);margin-top:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+/* Seiton: vier Teile, ein Ablauf */
+.fam-rail{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin-top:48px;border-top:2px solid var(--border)}
+.fam-rail span{position:relative;padding:16px 8px 0 0;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);transition:color .3s}
+.fam-rail span::before{content:"";position:absolute;left:0;top:-7px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--muted);transition:all .3s}
+.fam-rail span.hl{color:var(--accent2)}
+.fam-rail span.hl::before{background:var(--accent2);border-color:var(--accent2);box-shadow:0 0 12px var(--accent2)}
+.fam{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:28px}
+.card{position:relative;border:1px solid var(--border);border-radius:10px;background:var(--panel);padding:22px;display:flex;flex-direction:column;gap:14px;cursor:default;transition:border-color .25s,transform .25s,background .25s;outline:none}
+.card:hover,.card:focus-visible,.card.on{border-color:var(--accent);transform:translateY(-3px);background:var(--selected)}
+.card .ic{height:74px;display:flex;align-items:flex-end}
+.card h3{font-size:clamp(30px,2.6vw,40px);font-stretch:70%;line-height:.95}
+.card h3 small{display:block;font-size:.5em;font-weight:600;font-stretch:100%;letter-spacing:.02em;color:var(--muted-light);margin-top:6px}
+.card p{font-size:15px;color:var(--muted-light)}
+
+/* Für wen */
+.who{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;margin-top:48px}
+.roles{list-style:none;margin:0;padding:0}
+.roles li{display:flex;justify-content:space-between;align-items:baseline;gap:20px;padding:14px 0;border-bottom:1px solid var(--border);font-family:var(--display);font-stretch:70%;font-weight:700;font-size:clamp(26px,2.8vw,38px);line-height:1.05}
+.infra p{font-size:19px;color:#C3CCD8}
+.infra p+p{margin-top:14px}
+.chain{display:grid;gap:0;margin:26px 0;border-left:2px solid var(--border);padding-left:22px}
+.chain span{position:relative;padding:12px 0;font-size:19px;font-weight:600}
+.chain span::before{content:"";position:absolute;left:-29px;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:var(--bg);border:2px solid var(--muted)}
+.chain span.hl{color:var(--accent)}
+.chain span.hl::before{background:var(--accent);border-color:var(--accent)}
+.chain span.alt{color:var(--accent2)}
+.chain span.alt::before{background:var(--accent2);border-color:var(--accent2)}
+
+/* CTA */
+.cta{margin-top:150px;background:var(--accent);color:var(--bg)}
+.cta .wrap{padding-top:100px;padding-bottom:100px}
+.cta h2{font-size:clamp(56px,11vw,172px);font-stretch:62%;font-weight:900}
+.cta-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:40px;align-items:end;margin-top:40px}
+.cta p{font-size:21px;max-width:34em;font-weight:500}
+.cta .btn{background:var(--bg);color:var(--text);min-height:60px;padding:0 30px;font-size:18px}
+.cta .btn:hover{background:var(--panel)}
+.cta .btn.line{background:transparent;color:var(--bg);border:2px solid var(--bg)}
+.cta .btn.line:hover{background:rgba(15,17,23,.08)}
+.cta-btns{display:grid;gap:10px}
+
+/* Schriftfeld */
+.title-block{margin:48px 0;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;font-size:14px}
+.title-block>div{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:10px 14px;display:grid;gap:2px}
+.title-block>div:nth-child(4n){border-right:0}
+.title-block>div:nth-last-child(-n+4){border-bottom:0}
+.title-block small{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.title-block .name{font-family:var(--display);font-stretch:80%;font-weight:800;font-size:22px}
+.title-block a{color:var(--accent2)}
+.title-block .todo{color:var(--muted)}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1180px){ .tabs a{padding:0 10px} }
+@media (max-width:1100px){
+  .tabs{display:none}
+  .hero-row{grid-template-columns:minmax(0,1fr)}
+  .hero-cta{flex-direction:row;flex-wrap:wrap}
+  .play-body{grid-template-columns:minmax(0,1fr)}
+  .panel{border-left:0;border-top:1px solid var(--border)}
+  .dig,.chg,.dxf,.who,.depth{grid-template-columns:minmax(0,1fr)}
+  .tiles,.fam{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .flow-sum{grid-template-columns:auto auto;gap:10px 32px}
+  .flow-sum p{grid-column:1/-1}
+}
+@media (max-width:900px){
+  /* Kette senkrecht: wegfallende Schritte klappen nach oben zusammen */
+  .rail{left:38px;right:auto;top:30px;bottom:30px;width:2px;height:auto}
+  .rail i{left:-4px!important;animation:runv 3.2s linear infinite}
+  @keyframes runv{from{top:0}to{top:calc(100% - 10px)}}
+  .chain2{flex-direction:column}
+  .stp{display:grid;grid-template-columns:38px minmax(0,1fr);column-gap:18px;align-items:center;max-width:none;max-height:90px;padding:7px 0;transition:max-height .7s var(--ease),padding .7s var(--ease),opacity .45s ease}
+  .stp .no{margin:0;grid-row:1/3}
+  .stp .lb{margin:0;text-align:left;font-size:20px}
+  .stp .lb::after{left:0}
+  .stp .why{margin:2px 0 0;text-align:left;min-height:0}
+  .stp.gone{max-height:0;padding:0}
+  .ways{grid-template-columns:minmax(0,1fr)}
+  .way-text{grid-template-columns:minmax(0,1fr)}
+  .fam-rail span{font-size:10px;letter-spacing:.02em}
+}
+@media (max-width:700px){
+  body{font-size:16px}
+  .wrap{padding:0 16px}
+  .top .btn{display:none}
+  .h-title .r{text-align:left}
+  .time,.tiles,.fam{grid-template-columns:minmax(0,1fr)}
+  .time>div{border-right:0;border-bottom:1px solid var(--border)}
+  .minis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .cta-row{grid-template-columns:minmax(0,1fr)}
+  .title-block{grid-template-columns:1fr 1fr}
+  .title-block>div:nth-child(4n){border-right:1px solid var(--border)}
+  .title-block>div:nth-child(2n){border-right:0}
+  .title-block>div:nth-last-child(-n+4){border-bottom:1px solid var(--border)}
+  .title-block>div:nth-last-child(-n+2){border-bottom:0}
+  section.s{padding-top:100px}
+  .flow{padding:22px 14px 20px}
+  .rail{left:32px}
+  .seg button{padding:9px 12px;font-size:14px}
+  .scene-hint{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="Seiton Studio – Startseite">
+      <svg width="30" height="30" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="6" fill="#4F8EF7"/><g transform="rotate(-35 17 17)"><path fill="#0F1117" fill-rule="evenodd" d="M4.3 15.3H9A1.7 1.7 0 0 1 9 18.7H4.3A5 5 0 0 0 13.58 19L22.21 18.8A4.2 4.2 0 1 0 22.21 15.2L13.58 15A5 5 0 0 0 4.3 15.3ZM27.8 17A1.8 1.8 0 1 0 24.2 17A1.8 1.8 0 1 0 27.8 17Z"/><rect x="15.6" y="10.5" width="3.6" height="13" rx="1.8" fill="#38BDF8"/></g></svg>
+      Seiton <small>Studio</small>
+    </a>
+    <nav class="tabs" aria-label="Hauptnavigation">
+      <a href="#ablauf">Ablauf</a>
+      <a href="#digitalisieren">Digitalisieren</a>
+      <a href="#tiefe">Tiefe</a>
+      <a href="#bibliothek">Bibliothek</a>
+      <a href="#export">Fräsen</a>
+      <a href="#seiton">Seiton</a>
+    </nav>
+    <a class="btn" href="#demo">Live-Demo anfragen</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="wrap">
+
+    <h1 class="h-title">
+      <span class="l">Werkzeuge digitalisieren.</span>
+      <span class="r blue">Shadowboards standardisieren.</span>
+    </h1>
+
+    <div class="hero-row">
+      <p>Vom Werkzeug auf dem Tisch zum fertigen Shadowboard. Fräsen Sie selbst – oder lassen Sie Seiton Boards fräsen.</p>
+      <div class="less">
+        <span><b>Kein</b> Nachzeichnen.</span>
+        <span><b>Kein</b> Dokumentenwirrwarr.</span>
+        <span><b>Kein</b> Gefrickel.</span>
+      </div>
+      <div class="hero-cta">
+        <a class="btn" href="#demo">Live-Demo ansehen</a>
+        <a class="btn sec" href="#ablauf">So funktioniert es</a>
+      </div>
+    </div>
+
+    <!-- Interaktives Board -->
+    <div class="play" id="play">
+      <div class="play-bar">
+        <div class="hint"><span class="dot" aria-hidden="true"></span>Ziehen Sie die Werkzeuge. Die Prüfung läuft live mit.</div>
+        <div class="legend" aria-label="Legende der Frästiefen">
+          <span><i style="background:#4F8EF7"></i>20 mm</span>
+          <span><i style="background:#2F4F8F"></i>30 mm</span>
+          <span><i style="background:#38BDF8"></i>Griffmulde 10 mm</span>
+          <span><i style="border:1px solid #94A3B8"></i>Gravur</span>
+        </div>
+      </div>
+      <div class="play-body">
+        <div class="board-wrap">
+          <svg id="board" viewBox="0 0 1000 460" role="application" aria-label="Interaktives Shadowboard mit verschiebbaren Werkzeugen">
+            <rect x="20" y="20" width="960" height="420" rx="8" fill="#1A1D27" stroke="#2A2D3E" stroke-width="2"/>
+            <rect x="40" y="40" width="920" height="380" fill="none" stroke="#2A2D3E" stroke-dasharray="8 8"/>
+            <g id="engrText" tabindex="0" role="button" aria-label="Gravur verschieben"><rect x="-6" y="-22" width="0" height="30"/><path/></g>
+            <g id="tools"></g>
+          </svg>
+        </div>
+        <div class="panel">
+          <h4>Automatische Prüfungen</h4>
+          <div class="chk"><span>Überschneidungen</span><b id="cOv">0</b></div>
+          <div class="chk"><span>Abstand unter 15 mm</span><b id="cCl">0</b></div>
+          <div class="chk"><span>Randbereich verletzt</span><b id="cEd">0</b></div>
+          <div class="status" id="status" aria-live="polite">Prüfe Board …</div>
+          <label class="engrave-in" for="engrave"><span>Beschriftung · Gravur<small>Auf dem Board verschiebbar</small></span><input id="engrave" type="text" maxlength="24" placeholder="Boardname eingeben" autocomplete="off" spellcheck="false"></label>
+          <button class="btn" id="arrange" type="button">Automatisch anordnen</button>
+          <button class="btn sec" id="exportBtn" type="button" disabled>DXF exportieren</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ABLAUF ===================== -->
+<section class="s" id="ablauf">
+  <div class="wrap">
+    <h2 class="s-title">Zehn Schritte. Übrig bleiben drei.</h2>
+    <p class="s-lead">Die ganze Kette vom Werkzeug bis zum gefrästen Board. Schalten Sie um und sehen Sie, was wegfällt.</p>
+
+    <div class="flow-ctrl">
+      <div class="seg" role="group" aria-label="Ablauf wählen" id="flowSeg">
+        <button type="button" data-m="0" aria-pressed="true">Heute</button>
+        <button type="button" data-m="1" aria-pressed="false">Erstes Board mit Seiton</button>
+        <button type="button" data-m="2" aria-pressed="false">Jedes weitere Board</button>
+      </div>
+      <label class="mill"><input type="checkbox" id="noMill"><span class="sw" aria-hidden="true"></span>Keine eigene Fräse</label>
+    </div>
+
+    <div class="flow">
+      <div class="rail" aria-hidden="true"><i></i></div>
+      <ol class="chain2" id="chain"></ol>
+      <div class="flow-sum">
+        <div class="big" id="fCount">10<small>Schritte</small></div>
+        <div class="big" id="fTime">6:00<small>h</small></div>
+        <p id="fSay"><b>Heute:</b> jedes Board von vorn – vom Foto bis zur Tiefe jeder einzelnen Tasche. <span class="est">geschätzt</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== DIGITALISIEREN ===================== -->
+<section class="s" id="digitalisieren">
+  <div class="wrap">
+    <h2 class="s-title">Einmal digitalisieren. Immer wieder verwenden.</h2>
+    <p class="s-lead">Werkzeug auf den Seiton-Messbogen legen, Foto machen. Die Marker am Rand machen aus jedem Foto ein maßhaltiges Abbild – Perspektive, Maßstab und Kontur rechnet Seiton Studio selbst.</p>
+
+    <div class="dig">
+      <div class="dig-stage" id="digStage">
+        <div class="photo" aria-hidden="true">
+          <svg viewBox="0 0 600 380" width="100%" height="100%">
+            <defs><g id="mk"><rect width="44" height="44" fill="#0F1117"/><rect x="8" y="8" width="9" height="9" fill="#fff"/><rect x="26" y="8" width="9" height="9" fill="#fff"/><rect x="17" y="17" width="9" height="9" fill="#fff"/><rect x="8" y="26" width="18" height="9" fill="#fff"/><rect x="26" y="26" width="9" height="9" fill="#fff"/></g></defs>
+            <defs><linearGradient id="steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E4E9F0"/><stop offset=".42" stop-color="#A3AEBD"/><stop offset=".58" stop-color="#8793A3"/><stop offset="1" stop-color="#566072"/></linearGradient>
+              <filter id="toolShadow" x="-10%" y="-40%" width="125%" height="190%"><feDropShadow dx="7" dy="12" stdDeviation="7" flood-color="#0F1117" flood-opacity=".38"/></filter></defs>
+            <rect width="600" height="380" fill="#FFFFFF"/>
+            <use href="#mk" x="18" y="18"/><use href="#mk" x="538" y="18"/><use href="#mk" x="18" y="318"/><use href="#mk" x="538" y="318"/>
+            <path d="M106 174H140A17 17 0 0 1 140 208H106L114.8 227A44 44 0 0 0 181 207L428.8 205A36 36 0 1 0 428.8 177L181 175A44 44 0 0 0 114.8 155ZM478 191A16 16 0 1 0 446 191A16 16 0 1 0 478 191Z" fill="url(#steel)" fill-rule="evenodd" stroke="#4B5563" stroke-width="1" filter="url(#toolShadow)"/>
+            <path d="M192 182.5L420 184" stroke="#FFFFFF" stroke-opacity=".7" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M122 158A40 40 0 0 1 170 162M436 164A32 32 0 0 1 488 176" fill="none" stroke="#FFFFFF" stroke-opacity=".55" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <svg class="overlay" viewBox="0 0 600 380" width="100%" height="100%" role="img" aria-label="Werkzeugfoto wird entzerrt, abgetastet und als Vektorkontur erkannt">
+          <rect class="scan" x="0" y="0" width="600" height="4" fill="#38BDF8"/>
+          <g>
+            <path class="draw" pathLength="1" d="M106 174H140A17 17 0 0 1 140 208H106L114.8 227A44 44 0 0 0 181 207L428.8 205A36 36 0 1 0 428.8 177L181 175A44 44 0 0 0 114.8 155Z"/>
+            <circle class="draw" pathLength="1" cx="462" cy="191" r="16"/>
+          </g>
+          <g fill="#E2E8F0" stroke="#0F1117" stroke-width="1.5"><circle class="node" cx="106" cy="174" r="4.5"/><circle class="node" cx="106" cy="208" r="4.5"/><circle class="node" cx="114.8" cy="155" r="4.5"/><circle class="node" cx="114.8" cy="227" r="4.5"/><circle class="node" cx="157" cy="191" r="4.5"/><circle class="node" cx="181" cy="175" r="4.5"/><circle class="node" cx="428.8" cy="205" r="4.5"/><circle class="node" cx="498" cy="191" r="4.5"/></g>
+          <g class="fade" stroke="#38BDF8" stroke-width="1.5"><line x1="106" y1="280" x2="498" y2="280"/><line x1="106" y1="270" x2="106" y2="290"/><line x1="498" y1="270" x2="498" y2="290"/></g>
+          <g class="fade"><rect x="250" y="266" width="100" height="28" fill="#1A1D27"/><text x="300" y="286" text-anchor="middle" fill="#38BDF8" font-size="15" font-family="Segoe UI, Archivo, sans-serif">200,0 mm</text></g>
+        </svg>
+      </div>
+
+      <div class="dig-side">
+        <div class="timer" aria-live="off"><span id="tNum">0,0</span><small>Sek.</small></div>
+        <p class="note">pro Werkzeug, hier zeitgerafft</p>
+        <ol class="steps" id="digSteps">
+          <li><i></i>Aufnahme auf dem Messbogen</li>
+          <li><i></i>Perspektive korrigiert</li>
+          <li><i></i>Kontur erkannt</li>
+          <li><i></i>Maße übernommen</li>
+        </ol>
+        <button class="btn" id="digBtn" type="button">Nochmal abspielen</button>
+      </div>
+    </div>
+
+    <h3 class="ways-h">Drei Wege zum digitalen Werkzeug</h3>
+    <div class="ways" role="group" aria-label="Weg wählen">
+      <button class="way on" type="button" aria-pressed="true" data-w="0"><span>Weg 1</span><b>Handy + Messbogen</b></button>
+      <button class="way" type="button" aria-pressed="false" data-w="1"><span>Weg 2</span><b>Seiton Capture</b></button>
+      <button class="way" type="button" aria-pressed="false" data-w="2"><span>Weg 3</span><b>Datei</b></button>
+    </div>
+    <div class="way-text" id="wayText" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ===================== TIEFE ===================== -->
+<section class="s" id="tiefe">
+  <div class="wrap">
+    <h2 class="s-title">Jede Fläche hat ihre Dicke.</h2>
+    <p class="s-lead">Kopf dicker als der Griff? Dann wird die Tasche dort tiefer. Sie geben die Dicke einmal am Werkzeug an – die Frästiefe jeder Stufe rechnet Seiton aus. Griffmulden inklusive.</p>
+
+    <div class="depth">
+      <div class="scene" id="scene" aria-label="3D-Ansicht einer gestuften Werkzeugtasche, zum Drehen ziehen" role="img">
+        <div class="obj" id="obj"></div>
+        <div class="scene-tag"><div class="seg" role="group" aria-label="Ansicht"><button type="button" id="v3d" aria-pressed="true">3D</button><button type="button" id="v2d" aria-pressed="false">Draufsicht</button></div></div>
+        <div class="scene-hint">Ziehen zum Drehen</div>
+      </div>
+      <div class="depth-side">
+        <div class="rg"><div class="rg-h"><span><i style="background:#2F4F8F"></i>Köpfe</span><b id="oHead">14 mm</b></div><input type="range" min="4" max="30" value="14" id="rHead" aria-label="Dicke der Köpfe in mm"></div>
+        <div class="rg"><div class="rg-h"><span><i style="background:#4F8EF7"></i>Griff</span><b id="oGrip">8 mm</b></div><input type="range" min="4" max="30" value="8" id="rGrip" aria-label="Dicke des Griffs in mm"></div>
+        <div class="rg"><div class="rg-h"><span><i style="background:#38BDF8"></i>Griffmulde</span><b id="oRec">20 mm</b></div><input type="range" min="10" max="34" value="20" id="rRec" aria-label="Tiefe der Griffmulde in mm"></div>
+        <p class="formula">Die Frästiefe jeder Fläche ergibt sich aus ihrer <b>Dicke</b> und der <b>Eintauchtiefe</b> – etwa 70 % versenkt oder 5 mm Überstand zum Greifen. Jede Tiefe landet auf ihrer eigenen Ebene im DXF.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== BIBLIOTHEK ===================== -->
+<section class="s" id="bibliothek">
+  <div class="wrap">
+    <h2 class="s-title">Eine Bibliothek statt einzelner Dateien.</h2>
+
+    <div class="lib-top">
+      <label class="search">
+        <svg width="24" height="24" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="6" fill="none" stroke="#94A3B8" stroke-width="2"/><path d="M13 13l5 5" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="sr">Werkzeug suchen</span>
+        <input id="libSearch" type="search" placeholder="Werkzeug suchen" autocomplete="off">
+      </label>
+      <button class="chipf on" type="button" data-f="">Alle Labels</button>
+      <button class="chipf" type="button" data-f="montage 1">Montage 1</button>
+      <button class="chipf" type="button" data-f="maschine 4">Maschine 4</button>
+      <button class="chipf" type="button" data-f="instandhaltung">Instandhaltung</button>
+    </div>
+    <p class="count" id="libCount">8 Werkzeuge</p>
+    <div class="tiles" id="tiles">
+      <div class="tile" data-s="ring-maulschlüssel 17 maulschlüssel gabelschlüssel schlüssel montage 1"><div class="th" data-t="wrench"></div><div><b>Ring-Maulschlüssel 17</b><small>Schlüssel · Montage 1</small></div><span class="u">auf 12 Boards</span></div>
+      <div class="tile" data-s="schraubendreher ph2 schraubendreher montage 1"><div class="th" data-t="driver"></div><div><b>Schraubendreher PH2</b><small>Schraubendreher · Montage 1</small></div><span class="u">auf 5 Boards</span></div>
+      <div class="tile" data-s="kombizange 180 zange zangen maschine 4"><div class="th" data-t="pliers"></div><div><b>Kombizange 180</b><small>Zangen · Maschine 4</small></div><span class="u">auf 3 Boards</span></div>
+      <div class="tile" data-s="seitenschneider zange zangen maschine 4"><div class="th" data-t="cutter"></div><div><b>Seitenschneider</b><small>Zangen · Maschine 4</small></div><span class="u">auf 2 Boards</span></div>
+      <div class="tile" data-s="schlosserhammer hammer hämmer instandhaltung"><div class="th" data-t="hammer"></div><div><b>Schlosserhammer</b><small>Hämmer · Instandhaltung</small></div><span class="u">auf 1 Board</span></div>
+      <div class="tile" data-s="innensechskant 6 schlüssel montage 1"><div class="th" data-t="allen"></div><div><b>Innensechskant 6</b><small>Schlüssel · Montage 1</small></div><span class="u">auf 7 Boards</span></div>
+      <div class="tile" data-s="messschieber messmittel messen instandhaltung"><div class="th" data-t="caliper"></div><div><b>Messschieber</b><small>Messmittel · Instandhaltung</small></div><span class="u">auf 2 Boards</span></div>
+      <div class="tile" data-s="drehmomentschlüssel schlüssel maschine 4"><div class="th" data-t="torque"></div><div><b>Drehmomentschlüssel</b><small>Schlüssel · Maschine 4</small></div><span class="u">auf 4 Boards</span></div>
+    </div>
+    <div class="empty" id="libEmpty">Nichts gefunden.</div>
+    <div class="lib-foot"><span>Labels und gespeicherte Suchen</span><span>Werkzeuge als Datei weitergeben – zwischen Standorten</span><span>Windows und Mac</span></div>
+  </div>
+</section>
+
+<!-- ===================== ÄNDERUNGEN ===================== -->
+<section class="s" id="aenderungen">
+  <div class="wrap">
+    <h2 class="s-title">Werkzeug geändert? Alle Boards ziehen mit.</h2>
+    <div class="chg">
+      <div class="chg-text">
+        <p>Boards sind mit der Bibliothek verknüpft. Überall übernehmen oder als Kopie speichern – Sie entscheiden.</p>
+        <div class="chg-ctrl">
+          <button class="btn" id="editTool" type="button">Ring-Maulschlüssel 17 ändern</button>
+          <button class="btn sec" id="resetBoards" type="button">Zurücksetzen</button>
+        </div>
+        <div class="dlg" id="dlg" role="dialog" aria-labelledby="dlgT">
+          <h4 id="dlgT"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="none" stroke="#F59E0B" stroke-width="1.8"/><path d="M10 5.5v5.5M10 14v.5" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/></svg>Werkzeug wird mehrfach verwendet</h4>
+          <p>Wird auf 12 Boards verwendet – dort wird es ebenfalls geändert.</p>
+          <div class="row">
+            <button class="btn ghost" type="button" data-a="cancel">Abbrechen</button>
+            <button class="btn sec" type="button" data-a="copy">Als Kopie speichern</button>
+            <button class="btn" type="button" data-a="save">Speichern</button>
+          </div>
+        </div>
+      </div>
+      <div class="minis" id="minis" aria-label="Zwölf Boards, die den Ring-Maulschlüssel 17 verwenden"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FRÄSEN ===================== -->
+<section class="s" id="export">
+  <div class="wrap">
+    <h2 class="s-title">Vom Board zum fertigen Einsatz.</h2>
+    <div class="flow-ctrl">
+      <div class="seg" role="group" aria-label="Wer fräst?" id="millSeg">
+        <button type="button" data-k="own" aria-pressed="true">Ich habe eine Fräse</button>
+        <button type="button" data-k="svc" aria-pressed="false">Ich habe keine Fräse</button>
+      </div>
+    </div>
+    <div class="dxf">
+      <div class="swap">
+        <div id="clOwn">
+          <p class="big-claim"><span>Ihre Fräse.</span><span>Ihr CAM-System.</span><span style="color:var(--accent)">Ihre Daten.</span></p>
+          <p class="s-lead">Eine DXF, eine Ebene je Frästiefe – im CAM-Programm ein Klick pro Ebene statt eine Tiefe pro Tasche.</p>
+        </div>
+        <div id="clSvc" class="off">
+          <p class="big-claim"><span>Keine Fräse?</span><span>Kein CAM?</span><span style="color:var(--accent2)">Seiton Boards.</span></p>
+          <p class="s-lead">Sie gestalten das Board, wir fräsen es und liefern den fertigen Einsatz – passend für Ihre Schublade oder Wand.</p>
+        </div>
+      </div>
+      <div class="swap">
+        <div class="layers" id="pnOwn">
+          <div class="hd"><span>Board A.dxf</span><span class="good">bereit</span></div>
+          <div class="layer"><i style="background:#94A3B8"></i><span>Außenkontur</span><span>Zuschnitt</span></div>
+          <div class="layer"><i style="background:#4F8EF7"></i><span>Taschen 15 mm</span><span>2</span></div>
+          <div class="layer"><i style="background:#3E6CC4"></i><span>Taschen 25 mm</span><span>2</span></div>
+          <div class="layer"><i style="background:#2F4F8F"></i><span>Taschen 40 mm</span><span>1</span></div>
+          <div class="layer"><i style="background:#38BDF8"></i><span>Griffmulden 15 mm</span><span>4</span></div>
+          <div class="layer"><i style="background:#E2E8F0"></i><span>Gravur 0,5 mm</span><span>Namen</span></div>
+        </div>
+        <div class="order off" id="pnSvc">
+          <div class="hd"><span>Board A · 600 × 400 × 40 mm</span><span style="color:var(--accent2)">Seiton Boards</span></div>
+          <ol class="otrack" id="otrack">
+            <li><i></i>Board in Seiton Studio gestalten</li>
+            <li><i></i>Bestellen – direkt aus dem Board</li>
+            <li><i></i>Wir fräsen und gravieren</li>
+            <li><i></i>Fertiger Einsatz kommt zu Ihnen</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ZEIT ===================== -->
+<section class="s" id="zeit">
+  <div class="wrap">
+    <h2 class="s-title">Von Stunden zu Minuten.</h2>
+    <div class="time" id="timeBox">
+      <div class="old"><div class="clock">6:00 h</div><p class="lbl">heute, von Hand</p></div>
+      <div><div class="clock" id="clockNew">6:00 h</div><p class="lbl">erstes Board mit Seiton</p></div>
+      <div><div class="clock" id="clockNext">6:00 h</div><p class="lbl">jedes weitere Board aus der Bibliothek</p></div>
+    </div>
+    <p class="foot-note"><span class="est">geschätzt</span> Beispiel: Board mit 10 Werkzeugen, Arbeitszeit ohne Laufzeit der Maschine.</p>
+  </div>
+</section>
+
+<!-- ===================== SEITON ===================== -->
+<section class="s" id="seiton">
+  <div class="wrap">
+    <h2 class="s-title">Vier Teile. Ein Ablauf.</h2>
+    <p class="s-lead">Nehmen Sie, was Sie brauchen. Alles greift ineinander – vom ersten Foto bis zum fertigen Einsatz.</p>
+
+    <div class="fam-rail" id="famRail" aria-hidden="true">
+      <span data-p="cap">Aufnehmen</span><span data-p="lib">Bibliothek</span><span data-p="brd">Board</span><span data-p="dxf">Fräsdaten</span><span data-p="mill">Gefräst</span>
+    </div>
+    <div class="fam" id="fam">
+      <div class="card" tabindex="0" data-p="cap lib brd dxf">
+        <div class="ic"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="10" width="56" height="42" rx="5" fill="none" stroke="#4F8EF7" stroke-width="3"/><rect x="14" y="24" width="30" height="8" rx="4" fill="#4F8EF7"/><rect x="24" y="22" width="10" height="12" rx="5" fill="#38BDF8"/><path d="M20 58h24" stroke="#64748B" stroke-width="3" stroke-linecap="round"/></svg></div>
+        <h3>Seiton Studio<small>Die Software</small></h3>
+        <p>Digitalisieren, Werkzeuge pflegen, Boards gestalten, DXF exportieren. Windows und Mac.</p>
+      </div>
+      <div class="card" tabindex="0" data-p="cap">
+        <div class="ic"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><path d="M8 20 L32 8 L56 20 V52 H8 Z" fill="none" stroke="#4F8EF7" stroke-width="3" stroke-linejoin="round"/><circle cx="32" cy="22" r="5" fill="#38BDF8"/><path d="M32 27 L20 46 M32 27 L44 46" stroke="#38BDF8" stroke-width="1.5" stroke-dasharray="3 3"/><rect x="14" y="44" width="36" height="4" rx="1" fill="#E2E8F0"/></svg></div>
+        <h3>Seiton Capture<small>Die Aufnahmebox</small></h3>
+        <p>Kamera, Licht und Messfläche in einer Box. Werkzeug rein, Knopf drücken, fertig.</p>
+      </div>
+      <div class="card" tabindex="0" data-p="lib">
+        <div class="ic"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><path d="M16 44a12 12 0 0 1 1-24 16 16 0 0 1 30 4 10 10 0 0 1 1 20Z" fill="none" stroke="#4F8EF7" stroke-width="3" stroke-linejoin="round"/><rect x="22" y="50" width="6" height="6" rx="1" fill="#38BDF8"/><rect x="30" y="50" width="6" height="6" rx="1" fill="#4F8EF7"/><rect x="38" y="50" width="6" height="6" rx="1" fill="#2F4F8F"/></svg></div>
+        <h3>Seiton Library<small>Die Werkzeugdatenbank</small></h3>
+        <p>Unternehmensübergreifend in der Cloud: Werkzeuge, die schon jemand digitalisiert hat, einfach übernehmen. Im Abo.</p>
+      </div>
+      <div class="card" tabindex="0" data-p="mill">
+        <div class="ic"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><rect x="4" y="30" width="56" height="22" rx="3" fill="none" stroke="#4F8EF7" stroke-width="3"/><rect x="12" y="36" width="22" height="8" rx="4" fill="#2F4F8F"/><rect x="40" y="35" width="12" height="10" rx="2" fill="#2F4F8F"/><path d="M32 6 V22" stroke="#E2E8F0" stroke-width="4" stroke-linecap="round"/><path d="M26 6 H38" stroke="#E2E8F0" stroke-width="3" stroke-linecap="round"/><path d="M32 22 v4" stroke="#38BDF8" stroke-width="3" stroke-linecap="round"/></svg></div>
+        <h3>Seiton Boards<small>Der Fräsdienst</small></h3>
+        <p>Keine Fräse im Haus? Wir fräsen Ihre Boards und liefern sie einbaufertig.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FÜR WEN ===================== -->
+<section class="s" id="zielgruppe">
+  <div class="wrap">
+    <h2 class="s-title">Für alle, die eigentlich anderes zu tun haben.</h2>
+    <div class="who">
+      <ul class="roles">
+        <li>Lean Management</li>
+        <li>Industrial Engineering</li>
+        <li>5S-Verantwortliche</li>
+        <li>Produktions- und Abteilungsleiter</li>
+        <li>Werkstatt und Betriebsmittelbau</li>
+      </ul>
+      <div class="infra">
+        <p><strong style="color:var(--text)">Mit eigener Fräse:</strong> Ihre Infrastruktur bleibt. Seiton schließt nur die Lücke zwischen Werkzeug und Fräsdaten.</p>
+        <p><strong style="color:var(--text)">Ohne Fräse:</strong> Seiton Boards fräst für Sie. Sie brauchen nur die Werkzeuge und einen Drucker.</p>
+        <div class="chain"><span>Werkzeug</span><span>Digitales Werkzeug</span><span>Shadowboard</span><span class="hl">Fräsdaten – oder</span><span class="alt">fertiges Board, geliefert</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CTA ===================== -->
+<section class="cta" id="demo">
+  <div class="wrap">
+    <h2>Starten Sie mit einem Werkzeug.</h2>
+    <div class="cta-row">
+      <p>Wir zeigen Ihnen den kompletten Ablauf in einer kurzen Live-Demo – mit Ihrem Werkzeug.</p>
+      <div class="cta-btns">
+        <a class="btn" href="mailto:[E-MAIL]?subject=Seiton%20Live-Demo">Live-Demo anfragen</a>
+        <a class="btn line" href="#kontakt">Kontakt</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===================== SCHRIFTFELD ===================== -->
+<footer id="kontakt">
+  <div class="wrap">
+    <div class="title-block">
+      <div><small>Benennung</small><span class="name">Seiton Studio</span></div>
+      <div><small>Inhalt</small><span>Werkzeuge digitalisieren. Shadowboards standardisieren.</span></div>
+      <div><small>Maßstab</small><span>1:1</span></div>
+      <div><small>Plattform</small><span>Windows · Mac</span></div>
+      <div><small>Kontakt</small><span class="todo">[E-Mail-Adresse]</span></div>
+      <div><small>Telefon</small><span class="todo">[Telefon]</span></div>
+      <div><small>Rechtliches</small><span class="todo">Impressum (folgt)</span></div>
+      <div><small>&nbsp;</small><span class="todo">Datenschutz (folgt)</span></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var NS = 'http://www.w3.org/2000/svg';
+  var BOARD = '#1A1D27', A2 = '#38BDF8', D1 = '#4F8EF7', D2 = '#3E6CC4', D3 = '#2F4F8F';
+  function el(tag, attrs, parent){ var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function onView(node, fn, th){ new IntersectionObserver(function(ents, o){ ents.forEach(function(en){ if (en.isIntersecting){ o.disconnect(); fn(); } }); }, { threshold: th || .5 }).observe(node); }
+  function pressed(group, btn){ group.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'); }); }
+
+  /* ---------- Toast ---------- */
+  var toastEl = document.getElementById('toast'), toastT;
+  function toast(msg){ toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function(){ toastEl.classList.remove('show'); }, 2600); }
+
+  /* ---------- Interaktives Board ---------- */
+  var svg = document.getElementById('board'), layer = document.getElementById('tools');
+  // Tool drawings, shared by the board and the library tiles (about 1.6 px per mm).
+  // Finger recesses (A2) are long slots across the tool, like in the app. Two pocket levels per tool:
+  // D1 = shallow (20 mm), D3 = deep (30 mm); recess 10 mm.
+  var WR = 'M106 174H140A17 17 0 0 1 140 208H106L114.8 227A44 44 0 0 0 181 207L428.8 205A36 36 0 1 0 428.8 177L181 175A44 44 0 0 0 114.8 155Z', WR_HOLE = 'M478 191A16 16 0 1 0 446 191A16 16 0 1 0 478 191Z';
+  function cap(g, x, y, w, h, fill){
+    // Recess is shallower than the tool's pocket, so it lies underneath and shows only beside the tool
+    var r = el('rect',{x:x,y:y,width:w,height:h,rx:Math.min(w, h) / 2,fill:fill}), first = null;
+    for (var i = 0; i < g.children.length && !first; i++) if (g.children[i].getAttribute('class') !== 'bbox') first = g.children[i];
+    g.insertBefore(r, first); return r; }
+  function bar(g, x1, y1, x2, y2, w, c){ return el('line',{x1:x1,y1:y1,x2:x2,y2:y2,stroke:c,'stroke-width':w,'stroke-linecap':'round'},g); }
+  var TOOLS = {
+    wrench: { name:'Ring-Maulschlüssel 17', w:320, h:104, draw:function(g){
+      var k = 320 / 392;
+      el('path',{d:WR + WR_HOLE,'fill-rule':'evenodd',fill:D1,transform:'translate(' + (-106 * k) + ' ' + (52 - 191 * k) + ') scale(' + k + ')'},g);
+      cap(g,142,0,36,104,A2); } },
+    driver: { name:'Schraubendreher PH2', w:300, h:90, draw:function(g){
+      el('rect',{x:0,y:27,width:118,height:36,rx:14,fill:D3},g); el('rect',{x:114,y:37,width:14,height:16,rx:3,fill:D3},g);
+      el('rect',{x:126,y:40,width:162,height:10,rx:2,fill:D1},g); el('path',{d:'M286 40L300 43.5V46.5L286 50Z',fill:D1},g);
+      cap(g,41,0,36,90,A2); } },
+    pliers: { name:'Kombizange 180', w:292, h:96, draw:function(g){
+      el('path',{d:'M104 34L62 37L14 43Q4 48 14 53L62 59L104 62Z',fill:D3},g); el('circle',{cx:104,cy:48,r:18,fill:D3},g);
+      bar(g,112,40,282,20,14,D1); bar(g,112,56,282,76,14,D1); bar(g,168,33.4,280,20.2,20,D1); bar(g,168,62.6,280,75.8,20,D1);
+      cap(g,207,0,36,96,A2); } },
+    cutter: { name:'Seitenschneider', w:272, h:96, draw:function(g){
+      el('path',{d:'M86 32L44 38Q30 48 44 58L86 64Z',fill:D3},g); el('circle',{cx:86,cy:48,r:17,fill:D3},g);
+      bar(g,94,40,262,20,14,D1); bar(g,94,56,262,76,14,D1); bar(g,150,33.3,260,20.2,20,D1); bar(g,150,62.7,260,75.8,20,D1);
+      cap(g,190,0,36,96,A2); } },
+    caliper: { name:'Messschieber', w:290, h:124, draw:function(g){
+      el('rect',{x:16,y:40,width:274,height:22,rx:2,fill:D1},g);
+      el('path',{d:'M16 62H46V114L38 122L16 78Z',fill:D1},g); el('path',{d:'M18 40L26 8H34L42 40Z',fill:D1},g);
+      el('rect',{x:58,y:32,width:92,height:38,rx:4,fill:D3},g);
+      el('path',{d:'M58 70H84L64 118L58 114Z',fill:D3},g); el('path',{d:'M60 32L66 8H72L80 32Z',fill:D3},g);
+      el('circle',{cx:112,cy:76,r:6,fill:D3},g);
+      cap(g,197,3,36,96,A2); } },
+    hammer: { name:'Schlosserhammer', w:100, h:220, draw:function(g){
+      el('path',{d:'M4 0H66L100 10V30L66 40H4Q0 40 0 36V4Q0 0 4 0Z',fill:D3},g);
+      el('path',{d:'M40 38H60L63 212Q63 220 55 220H45Q37 220 37 212Z',fill:D1},g);
+      cap(g,4,132,92,34,A2); } },
+    allen: { name:'Innensechskant 6', w:80, h:150, draw:function(g){
+      el('path',{d:'M36 2V122Q36 140 54 140H78',fill:'none',stroke:D1,'stroke-width':12,'stroke-linejoin':'round'},g);
+      cap(g,0,46,72,28,A2); } },
+    torque: { name:'Drehmomentschlüssel', w:320, h:90, draw:function(g){
+      el('rect',{x:0,y:27,width:110,height:36,rx:14,fill:D1},g); el('rect',{x:104,y:35,width:190,height:20,rx:8,fill:D1},g);
+      el('circle',{cx:298,cy:45,r:22,fill:D3},g);
+      cap(g,37,0,36,90,A2); } }
+  };
+  var tools = [
+    { id:'wrench',  start:[80,50],   auto:[60,60] },
+    { id:'driver',  start:[160,120], auto:[60,200] },
+    { id:'pliers',  start:[300,300], auto:[380,205] },
+    { id:'caliper', start:[600,290], auto:[400,60] },
+    { id:'hammer',  start:[860,120], auto:[830,90] },
+    { id:'allen',   start:[520,120], auto:[710,60] }
+  ].map(function(t){ var d = TOOLS[t.id]; t.name = d.name; t.w = d.w; t.h = d.h; t.draw = d.draw; return t; });
+  var BX = 40, BY = 40, BW = 920, BH = 380, GAP = 15;
+
+  tools.forEach(function(t){
+    t.x = t.start[0]; t.y = t.start[1];
+    var g = el('g',{ 'class':'tool', tabindex:'0', role:'button', 'aria-label': t.name + ' verschieben' }, layer);
+    el('rect',{ 'class':'bbox', x:-7, y:-7, width:t.w+14, height:t.h+14, rx:8 }, g);
+    t.draw(g); t.g = g; place(t);
+
+    var dragging = false, off = { x:0, y:0 };
+    g.addEventListener('pointerdown', function(e){
+      e.preventDefault(); dragging = true; g.setPointerCapture(e.pointerId); g.classList.add('drag'); svg.classList.remove('anim');
+      layer.appendChild(g);
+      var p = toSvg(e); off.x = p.x - t.x; off.y = p.y - t.y;
+    });
+    g.addEventListener('pointermove', function(e){
+      if (!dragging) return;
+      var p = toSvg(e);
+      t.x = clamp(p.x - off.x, 0, 1000 - t.w); t.y = clamp(p.y - off.y, 0, 460 - t.h);
+      place(t); check();
+    });
+    function end(){ if (!dragging) return; dragging = false; g.classList.remove('drag'); check(); }
+    g.addEventListener('pointerup', end); g.addEventListener('pointercancel', end);
+    g.addEventListener('keydown', function(e){
+      var step = e.shiftKey ? 50 : 10, moved = true;
+      if (e.key === 'ArrowLeft') t.x -= step; else if (e.key === 'ArrowRight') t.x += step;
+      else if (e.key === 'ArrowUp') t.y -= step; else if (e.key === 'ArrowDown') t.y += step; else moved = false;
+      if (moved){ e.preventDefault(); svg.classList.remove('anim'); t.x = clamp(t.x, 0, 1000 - t.w); t.y = clamp(t.y, 0, 460 - t.h); place(t); check(); }
+    });
+  });
+
+  function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+  function toSvg(e){ var p = svg.createSVGPoint(); p.x = e.clientX; p.y = e.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); }
+  function place(t){ t.g.style.transform = 'translate(' + t.x + 'px,' + t.y + 'px)'; }
+  function hit(a, b, pad){ return a.x - pad < b.x + b.w && a.x + a.w + pad > b.x && a.y - pad < b.y + b.h && a.y + a.h + pad > b.y; }
+
+  var cOv = document.getElementById('cOv'), cCl = document.getElementById('cCl'), cEd = document.getElementById('cEd');
+  var statusEl = document.getElementById('status'), exportBtn = document.getElementById('exportBtn');
+  function check(){
+    var st = {}, ov = 0, cl = 0, ed = 0;
+    tools.forEach(function(t){ st[t.id] = 'ok'; });
+    for (var i = 0; i < tools.length; i++){
+      for (var j = i + 1; j < tools.length; j++){
+        var a = tools[i], b = tools[j];
+        if (hit(a, b, 0)){ ov++; st[a.id] = st[b.id] = 'overlap'; }
+        else if (hit(a, b, GAP)){ cl++; if (st[a.id] === 'ok') st[a.id] = 'close'; if (st[b.id] === 'ok') st[b.id] = 'close'; }
+      }
+    }
+    tools.forEach(function(t){
+      if (t.x < BX || t.y < BY || t.x + t.w > BX + BW || t.y + t.h > BY + BH){ ed++; if (st[t.id] !== 'overlap') st[t.id] = 'edge'; }
+      t.g.classList.remove('st-ok','st-close','st-edge','st-overlap'); t.g.classList.add('st-' + st[t.id]);
+    });
+    cOv.textContent = ov; cOv.className = ov ? 'bad' : 'good';
+    cCl.textContent = cl; cCl.className = cl ? 'warnc' : 'good';
+    cEd.textContent = ed; cEd.className = ed ? 'warnc' : 'good';
+    var okAll = !ov && !cl && !ed;
+    exportBtn.disabled = !okAll;
+    exportBtn.className = okAll ? 'btn' : 'btn sec';
+    statusEl.innerHTML = okAll
+      ? '<strong class="good">Alles in Ordnung.</strong> Bereit für den Export.'
+      : (ov ? '<strong class="bad">Überschneidung.</strong> Verschieben oder anordnen lassen.' : '<strong class="warnc">Zu knapp.</strong> Abstände prüfen.');
+  }
+  // Beschriftung: Eingabe im Panel erscheint sofort als Gravur unten links auf dem Board
+  var engrText = document.getElementById('engrText'), engrIn = document.getElementById('engrave'), engrTouched = false, typeT;
+  // Single-stroke font as in the app (Hershey Sans 1-stroke, futural.jhf; umlauts and sharp s composed by the app).
+  // Acknowledgements required by its licence:
+  //  - The Hershey Fonts were originally created by Dr. A. V. Hershey while working at the U. S. National Bureau of Standards.
+  //  - The format of the Font data in this distribution was originally created by James Hurt, Cognition, Inc.,
+  //    900 Technology Park Drive, Billerica, MA 01821 (mit-eddie!ci-dandelion!hurt)
+  // Per glyph: advance, then strokes as x,y pairs; y down, baseline at 9.
+  var HF = {"\t":[16]," ":[16],"!":[10,[5,-12,5,2],[5,7,4,8,5,9,6,8,5,7]],"\"":[16,[4,-12,4,-5],[12,-12,12,-5]],"#":[21,[11,-16,4,16],[17,-16,10,16],[4,-3,18,-3],[3,3,17,3]],"$":[20,[8,-16,8,13],[12,-16,12,13],[17,-9,15,-11,12,-12,8,-12,5,-11,3,-9,3,-7,4,-5,5,-4,7,-3,13,-1,15,0,16,1,17,3,17,6,15,8,12,9,8,9,5,8,3,6]],"%":[24,[21,-12,3,9],[8,-12,10,-10,10,-8,9,-6,7,-5,5,-5,3,-7,3,-9,4,-11,6,-12,8,-12,10,-11,13,-10,16,-10,19,-11,21,-12],[17,2,15,3,14,5,14,7,16,9,18,9,20,8,21,6,21,4,19,2,17,2]],"&":[26,[23,-3,23,-4,22,-5,21,-5,20,-4,19,-2,17,3,15,6,13,8,11,9,7,9,5,8,4,7,3,5,3,3,4,1,5,0,12,-4,13,-5,14,-7,14,-9,13,-11,11,-12,9,-11,8,-9,8,-7,9,-4,11,-1,16,6,18,8,20,9,22,9,23,8,23,7]],"'":[10,[5,-10,4,-11,5,-12,6,-11,6,-9,5,-7,4,-6]],"(":[14,[11,-16,9,-14,7,-11,5,-7,4,-2,4,2,5,7,7,11,9,14,11,16]],")":[14,[3,-16,5,-14,7,-11,9,-7,10,-2,10,2,9,7,7,11,5,14,3,16]],"*":[16,[8,-6,8,6],[3,-3,13,3],[13,-3,3,3]],"+":[26,[13,-9,13,9],[4,0,22,0]],",":[8,[5,5,4,6,3,5,4,4,5,5,5,7,3,9]],"-":[26,[4,0,22,0]],".":[8,[4,4,3,5,4,6,5,5,4,4]],"/":[22,[20,-16,2,16]],"0":[20,[9,-12,6,-11,4,-8,3,-3,3,0,4,5,6,8,9,9,11,9,14,8,16,5,17,0,17,-3,16,-8,14,-11,11,-12,9,-12]],"1":[20,[6,-8,8,-9,11,-12,11,9]],"2":[20,[4,-7,4,-8,5,-10,6,-11,8,-12,12,-12,14,-11,15,-10,16,-8,16,-6,15,-4,13,-1,3,9,17,9]],"3":[20,[5,-12,16,-12,10,-4,13,-4,15,-3,16,-2,17,1,17,3,16,6,14,8,11,9,8,9,5,8,4,7,3,5]],"4":[20,[13,-12,3,2,18,2],[13,-12,13,9]],"5":[20,[15,-12,5,-12,4,-3,5,-4,8,-5,11,-5,14,-4,16,-2,17,1,17,3,16,6,14,8,11,9,8,9,5,8,4,7,3,5]],"6":[20,[16,-9,15,-11,12,-12,10,-12,7,-11,5,-8,4,-3,4,2,5,6,7,8,10,9,11,9,14,8,16,6,17,3,17,2,16,-1,14,-3,11,-4,10,-4,7,-3,5,-1,4,2]],"7":[20,[17,-12,7,9],[3,-12,17,-12]],"8":[20,[8,-12,5,-11,4,-9,4,-7,5,-5,7,-4,11,-3,14,-2,16,0,17,2,17,5,16,7,15,8,12,9,8,9,5,8,4,7,3,5,3,2,4,0,6,-2,9,-3,13,-4,15,-5,16,-7,16,-9,15,-11,12,-12,8,-12]],"9":[20,[16,-5,15,-2,13,0,10,1,9,1,6,0,4,-2,3,-5,3,-6,4,-9,6,-11,9,-12,10,-12,13,-11,15,-9,16,-5,16,0,15,5,13,8,10,9,8,9,5,8,4,6]],":":[8,[4,-3,3,-2,4,-1,5,-2,4,-3],[4,4,3,5,4,6,5,5,4,4]],";":[8,[4,-3,3,-2,4,-1,5,-2,4,-3],[5,5,4,6,3,5,4,4,5,5,5,7,3,9]],"<":[24,[20,-9,4,0,20,9]],"=":[26,[4,-3,22,-3],[4,3,22,3]],">":[24,[4,-9,20,0,4,9]],"?":[18,[3,-7,3,-8,4,-10,5,-11,7,-12,11,-12,13,-11,14,-10,15,-8,15,-6,14,-4,13,-3,9,-1,9,2],[9,7,8,8,9,9,10,8,9,7]],"@":[27,[18,-4,17,-6,15,-7,12,-7,10,-6,9,-5,8,-2,8,1,9,3,11,4,14,4,16,3,17,1],[12,-7,10,-5,9,-2,9,1,10,3,11,4],[18,-7,17,1,17,3,19,4,21,4,23,2,24,-1,24,-3,23,-6,22,-8,20,-10,18,-11,15,-12,12,-12,9,-11,7,-10,5,-8,4,-6,3,-3,3,0,4,3,5,5,7,7,9,8,12,9,15,9,18,8,20,7,21,6],[19,-7,18,1,18,3,19,4]],"A":[18,[9,-12,1,9],[9,-12,17,9],[4,2,14,2]],"B":[21,[4,-12,4,9],[4,-12,13,-12,16,-11,17,-10,18,-8,18,-6,17,-4,16,-3,13,-2],[4,-2,13,-2,16,-1,17,0,18,2,18,5,17,7,16,8,13,9,4,9]],"C":[21,[18,-7,17,-9,15,-11,13,-12,9,-12,7,-11,5,-9,4,-7,3,-4,3,1,4,4,5,6,7,8,9,9,13,9,15,8,17,6,18,4]],"D":[21,[4,-12,4,9],[4,-12,11,-12,14,-11,16,-9,17,-7,18,-4,18,1,17,4,16,6,14,8,11,9,4,9]],"E":[19,[4,-12,4,9],[4,-12,17,-12],[4,-2,12,-2],[4,9,17,9]],"F":[18,[4,-12,4,9],[4,-12,17,-12],[4,-2,12,-2]],"G":[21,[18,-7,17,-9,15,-11,13,-12,9,-12,7,-11,5,-9,4,-7,3,-4,3,1,4,4,5,6,7,8,9,9,13,9,15,8,17,6,18,4,18,1],[13,1,18,1]],"H":[22,[4,-12,4,9],[18,-12,18,9],[4,-2,18,-2]],"I":[8,[4,-12,4,9]],"J":[16,[12,-12,12,4,11,7,10,8,8,9,6,9,4,8,3,7,2,4,2,2]],"K":[21,[4,-12,4,9],[18,-12,4,2],[9,-3,18,9]],"L":[17,[4,-12,4,9],[4,9,16,9]],"M":[24,[4,-12,4,9],[4,-12,12,9],[20,-12,12,9],[20,-12,20,9]],"N":[22,[4,-12,4,9],[4,-12,18,9],[18,-12,18,9]],"O":[22,[9,-12,7,-11,5,-9,4,-7,3,-4,3,1,4,4,5,6,7,8,9,9,13,9,15,8,17,6,18,4,19,1,19,-4,18,-7,17,-9,15,-11,13,-12,9,-12]],"P":[21,[4,-12,4,9],[4,-12,13,-12,16,-11,17,-10,18,-8,18,-5,17,-3,16,-2,13,-1,4,-1]],"Q":[22,[9,-12,7,-11,5,-9,4,-7,3,-4,3,1,4,4,5,6,7,8,9,9,13,9,15,8,17,6,18,4,19,1,19,-4,18,-7,17,-9,15,-11,13,-12,9,-12],[12,5,18,11]],"R":[21,[4,-12,4,9],[4,-12,13,-12,16,-11,17,-10,18,-8,18,-6,17,-4,16,-3,13,-2,4,-2],[11,-2,18,9]],"S":[20,[17,-9,15,-11,12,-12,8,-12,5,-11,3,-9,3,-7,4,-5,5,-4,7,-3,13,-1,15,0,16,1,17,3,17,6,15,8,12,9,8,9,5,8,3,6]],"T":[16,[8,-12,8,9],[1,-12,15,-12]],"U":[22,[4,-12,4,3,5,6,7,8,10,9,12,9,15,8,17,6,18,3,18,-12]],"V":[18,[1,-12,9,9],[17,-12,9,9]],"W":[24,[2,-12,7,9],[12,-12,7,9],[12,-12,17,9],[22,-12,17,9]],"X":[20,[3,-12,17,9],[17,-12,3,9]],"Y":[18,[1,-12,9,-2,9,9],[17,-12,9,-2]],"Z":[20,[17,-12,3,9],[3,-12,17,-12],[3,9,17,9]],"[":[14,[4,-16,4,16],[5,-16,5,16],[4,-16,11,-16],[4,16,11,16]],"\\":[14,[0,-12,14,12]],"]":[14,[9,-16,9,16],[10,-16,10,16],[3,-16,10,-16],[3,16,10,16]],"^":[16,[8,-14,0,0],[8,-14,16,0]],"_":[18,[0,16,18,16]],"`":[8,[5,-7,3,-5,3,-3,4,-2,5,-3,4,-4,3,-3]],"{":[14,[9,-16,7,-15,6,-14,5,-12,5,-10,6,-8,7,-7,8,-5,8,-3,6,-1],[7,-15,6,-13,6,-11,7,-9,8,-8,9,-6,9,-4,8,-2,4,0,8,2,9,4,9,6,8,8,7,9,6,11,6,13,7,15],[6,1,8,3,8,5,7,7,6,8,5,10,5,12,6,14,7,15,9,16]],"|":[8,[4,-16,4,16]],"}":[14,[5,-16,7,-15,8,-14,9,-12,9,-10,8,-8,7,-7,6,-5,6,-3,8,-1],[7,-15,8,-13,8,-11,7,-9,6,-8,5,-6,5,-4,6,-2,10,0,6,2,5,4,5,6,6,8,7,9,8,11,8,13,7,15],[8,1,6,3,6,5,7,7,8,8,9,10,9,12,8,14,7,15,5,16]],"~":[24,[3,3,3,1,4,-2,6,-3,8,-3,10,-2,14,1,16,2,18,2,20,1,21,-1],[3,1,4,-1,6,-2,8,-2,10,-1,14,2,16,3,18,3,20,2,21,-1,21,-3]]," ":[16],"°":[12,[9,-9,9,-8,8,-7,7,-6,6,-6,5,-6,4,-7,3,-8,3,-9,3,-10,4,-11,5,-12,6,-12,7,-12,8,-11,9,-10,9,-9]],"·":[8,[4,4,3,5,4,6,5,5,4,4]],"Ä":[18,[9,-12,1,9],[9,-12,17,9],[4,2,14,2],[5,-15,5,-12],[13,-15,13,-12]],"Ö":[22,[9,-12,7,-11,5,-9,4,-7,3,-4,3,1,4,4,5,6,7,8,9,9,13,9,15,8,17,6,18,4,19,1,19,-4,18,-7,17,-9,15,-11,13,-12,9,-12],[7,-15,7,-12],[15,-15,15,-12]],"×":[17,[3,-5,14,9],[14,-5,3,9]],"Ø":[22,[9,-12,7,-11,5,-9,4,-7,3,-4,3,1,4,4,5,6,7,8,9,9,13,9,15,8,17,6,18,4,19,1,19,-4,18,-7,17,-9,15,-11,13,-12,9,-12],[1,11,21,-14]],"Ü":[22,[4,-12,4,3,5,6,7,8,10,9,12,9,15,8,17,6,18,3,18,-12],[7,-15,7,-12],[15,-15,15,-12]],"ß":[18,[4,9,4,-7,5,-10,7,-12,10,-12,13,-11,14,-9,14,-6,12,-4,10,-3,13,-2,15,0,15,4,13,7,10,8,7,7]],"‐":[26,[4,0,22,0]],"–":[26,[4,0,22,0]],"—":[26,[4,0,22,0]],"‘":[10,[5,-10,4,-11,5,-12,6,-11,6,-9,5,-7,4,-6]],"’":[10,[5,-10,4,-11,5,-12,6,-11,6,-9,5,-7,4,-6]],"‚":[10,[5,-10,4,-11,5,-12,6,-11,6,-9,5,-7,4,-6]],"“":[16,[4,-12,4,-5],[12,-12,12,-5]],"”":[16,[4,-12,4,-5],[12,-12,12,-5]],"„":[16,[4,-12,4,-5],[12,-12,12,-5]],"→":[24,[4,-9,20,0,4,9]]};
+  var ENGR_CAP = 16, ENGR_TRACK = 0.02, engr = { strokes:[], width:0 };   // cap height 10 mm; tracking as in the app
+  var engrPath = engrText.querySelector('path'), engrHit = engrText.querySelector('rect');
+  function engrStrokes(text){
+    var sc = ENGR_CAP / 21, gap = ENGR_TRACK * ENGR_CAP, pen = 0, out = [];
+    for (var i = 0; i < text.length; i++){
+      var gl = HF[text.charAt(i)] || HF['?'];
+      for (var k = 1; k < gl.length; k++){ var st = gl[k], pts = []; for (var j = 0; j < st.length; j += 2) pts.push([pen + st[j] * sc, (st[j + 1] - 9) * sc]); out.push(pts); }
+      pen += gl[0] * sc + gap;
+    }
+    return { strokes:out, width:Math.max(pen - gap, 0) };
+  }
+  function syncEngr(){
+    engr = engrStrokes(engrIn.value.toUpperCase());
+    engrPath.setAttribute('d', engr.strokes.map(function(st){ return 'M' + st.map(function(q){ return q[0].toFixed(2) + ' ' + q[1].toFixed(2); }).join('L'); }).join(''));
+    engrHit.setAttribute('width', engr.width ? engr.width + 12 : 0); placeEngr();
+  }
+  // Gravur verschieben: ziehen oder Pfeiltasten, bleibt auf dem Board
+  var ex = 60, ey = 404, eDrag = null;
+  function placeEngr(){
+    ex = clamp(ex, BX, Math.max(BX, BX + BW - engr.width)); ey = clamp(ey, BY + ENGR_CAP + 4, BY + BH - 6);
+    engrText.setAttribute('transform', 'translate(' + ex + ' ' + ey + ')');
+  }
+  engrText.addEventListener('pointerdown', function(e){ e.preventDefault(); var p = toSvg(e); eDrag = { x:p.x - ex, y:p.y - ey }; engrText.setPointerCapture(e.pointerId); engrText.classList.add('drag'); });
+  engrText.addEventListener('pointermove', function(e){ if (!eDrag) return; var p = toSvg(e); ex = p.x - eDrag.x; ey = p.y - eDrag.y; placeEngr(); });
+  function eEnd(){ eDrag = null; engrText.classList.remove('drag'); }
+  engrText.addEventListener('pointerup', eEnd); engrText.addEventListener('pointercancel', eEnd);
+  engrText.addEventListener('keydown', function(e){
+    var step = e.shiftKey ? 50 : 10, k = { ArrowLeft:[-step,0], ArrowRight:[step,0], ArrowUp:[0,-step], ArrowDown:[0,step] }[e.key];
+    if (k){ e.preventDefault(); ex += k[0]; ey += k[1]; placeEngr(); }
+  });
+  engrIn.addEventListener('input', function(){ engrTouched = true; clearTimeout(typeT); engrIn.parentNode.classList.remove('typing'); syncEngr(); });
+  function typeLabel(text){
+    if (engrTouched || engrIn.value) return;
+    var i = 0; engrIn.parentNode.classList.add('typing');
+    (function step(){ engrIn.value = text.slice(0, ++i); syncEngr(); if (i < text.length) typeT = setTimeout(step, reduce ? 0 : 75); else engrIn.parentNode.classList.remove('typing'); })();
+  }
+  document.getElementById('arrange').addEventListener('click', function(){
+    if (!reduce) svg.classList.add('anim');
+    tools.forEach(function(t){ t.x = t.auto[0]; t.y = t.auto[1]; place(t); });
+    setTimeout(check, reduce ? 0 : 720);
+    setTimeout(function(){ typeLabel('Montage 1 – Wagen 3'); }, reduce ? 0 : 900);
+  });
+  /* ---------- DXF-Export: echte Datei, eine Ebene je Frästiefe ---------- */
+  // Simplified on purpose, but built like the app: three layers - two pocket depths (a tool may have
+  // both, e.g. hammer head deep, handle shallow) and one shallower finger-recess layer. Regions of one
+  // tool do not overlap (the deep area is cut out of the shallow one); the recess overlaps the tool
+  // like in the app. Engraving goes on its own layer as open single strokes (V bit follows the line).
+  // No board outline. Each pocket layer is rasterised per tool, traced with marching squares and
+  // simplified; output is DXF R12 in mm, Y up, origin bottom left.
+  var PX_MM = 1.6, DEPTH = {}; DEPTH[D1] = 20; DEPTH[D3] = 30; DEPTH[A2] = 10;
+  var LAYERS = [{ d:20, name:'POCKET_D20.0', aci:5 }, { d:30, name:'POCKET_D30.0', aci:6 }, { d:10, name:'RECESS_D10.0', aci:4, recess:true }];
+  var RS = 6, PAD = 10 * RS;   // drawings reach past w/h (round caps)
+  function depthOf(n){ return DEPTH[n.getAttribute('fill')] || DEPTH[n.getAttribute('stroke')] || 0; }
+  function drawNode(ctx, n){
+    var fill = n.getAttribute('fill'), stroke = n.getAttribute('stroke');
+    var m = n.transform && n.transform.baseVal.numberOfItems ? n.transform.baseVal.consolidate().matrix : { a:1, b:0, c:0, d:1, e:0, f:0 };
+    ctx.setTransform(RS, 0, 0, RS, PAD, PAD); ctx.transform(m.a, m.b, m.c, m.d, m.e, m.f);
+    ctx.fillStyle = ctx.strokeStyle = '#000'; ctx.lineCap = ctx.lineJoin = 'round';
+    var a = function(k){ return parseFloat(n.getAttribute(k)) || 0; }, p = new Path2D();
+    if (n.tagName === 'rect'){ var r = Math.min(a('rx'), a('width') / 2, a('height') / 2); p.roundRect(a('x'), a('y'), a('width'), a('height'), r); }
+    else if (n.tagName === 'circle') p.arc(a('cx'), a('cy'), a('r'), 0, 2 * Math.PI);
+    else if (n.tagName === 'line'){ p.moveTo(a('x1'), a('y1')); p.lineTo(a('x2'), a('y2')); }
+    else if (n.tagName === 'path') p = new Path2D(n.getAttribute('d'));
+    if (fill && fill !== 'none') ctx.fill(p, n.getAttribute('fill-rule') === 'evenodd' ? 'evenodd' : 'nonzero');
+    if (stroke){ ctx.lineWidth = a('stroke-width'); ctx.stroke(p); }
+  }
+  // Mask of one layer of one tool, or null when the tool has nothing on it
+  function rasterTool(t, L){
+    var nodes = Array.prototype.filter.call(t.g.children, function(n){ return n.getAttribute('class') !== 'bbox'; });
+    var own = nodes.filter(function(n){ return depthOf(n) === L.d; });
+    if (!own.length) return null;
+    var W = Math.ceil(t.w * RS) + 2 * PAD, H = Math.ceil(t.h * RS) + 2 * PAD;
+    var c = document.createElement('canvas'); c.width = W; c.height = H;
+    var ctx = c.getContext('2d');
+    own.forEach(function(n){ drawNode(ctx, n); });
+    if (!L.recess){
+      ctx.globalCompositeOperation = 'destination-out';
+      nodes.forEach(function(n){ if (depthOf(n) > L.d && n.getAttribute('fill') !== A2) drawNode(ctx, n); });
+    }
+    return { img:ctx.getImageData(0, 0, W, H).data, W:W, H:H };
+  }
+  // Closed contours (in board px) of the filled area, edge points interpolated on the alpha channel
+  function trace(r, ox, oy){
+    var W = r.W, H = r.H, img = r.img, adj = new Map(), pts = new Map();
+    function v(x, y){ return img[(y * W + x) * 4 + 3] / 255; }
+    function ept(k){
+      if (!pts.has(k)){
+        var e = k >> 1, x = e % W, y = (e - x) / W, hz = !(k & 1), v0 = v(x, y), v1 = hz ? v(x + 1, y) : v(x, y + 1), f = (0.5 - v0) / (v1 - v0);
+        pts.set(k, [ox + ((hz ? x + f : x) + 0.5 - PAD) / RS, oy + ((hz ? y : y + f) + 0.5 - PAD) / RS]);
+      }
+      return k;
+    }
+    function seg(a, b){ (adj.get(a) || adj.set(a, []).get(a)).push(b); (adj.get(b) || adj.set(b, []).get(b)).push(a); ept(a); ept(b); }
+    for (var y = 0; y < H - 1; y++) for (var x = 0; x < W - 1; x++){
+      var tl = v(x, y) >= .5, tr = v(x + 1, y) >= .5, br = v(x + 1, y + 1) >= .5, bl = v(x, y + 1) >= .5;
+      var c = (tl ? 8 : 0) | (tr ? 4 : 0) | (br ? 2 : 0) | (bl ? 1 : 0);
+      if (!c || c === 15) continue;
+      var T = (y * W + x) * 2, B = ((y + 1) * W + x) * 2, L = (y * W + x) * 2 + 1, R = (y * W + x + 1) * 2 + 1;
+      var mid = (v(x, y) + v(x + 1, y) + v(x + 1, y + 1) + v(x, y + 1)) / 4 >= .5;
+      switch (c){
+        case 1: case 14: seg(L, B); break;   case 2: case 13: seg(B, R); break;
+        case 3: case 12: seg(L, R); break;   case 4: case 11: seg(T, R); break;
+        case 6: case 9: seg(T, B); break;    case 7: case 8: seg(T, L); break;
+        case 5: if (mid){ seg(T, L); seg(B, R); } else { seg(T, R); seg(L, B); } break;
+        case 10: if (mid){ seg(T, R); seg(L, B); } else { seg(T, L); seg(B, R); } break;
+      }
+    }
+    var loops = [], seen = new Set();
+    adj.forEach(function(_, start){
+      if (seen.has(start)) return;
+      var loop = [], prev = -1, cur = start;
+      do { seen.add(cur); loop.push(pts.get(cur)); var nb = adj.get(cur), nx = nb[0] !== prev ? nb[0] : nb[1]; prev = cur; cur = nx; } while (cur !== start && !seen.has(cur));
+      if (loop.length > 2) loops.push(simplify(loop, 0.05 * PX_MM));
+    });
+    return loops;
+  }
+  // Douglas-Peucker on a closed loop, split at the point farthest from the first one
+  function simplify(pts, tol){
+    function dp(a, b, out){
+      var ax = pts[a][0], ay = pts[a][1], dx = pts[b % pts.length][0] - ax, dy = pts[b % pts.length][1] - ay, L = Math.hypot(dx, dy) || 1e-9, best = 0, bi = -1;
+      for (var i = a + 1; i < b; i++){ var d = Math.abs((pts[i][0] - ax) * dy - (pts[i][1] - ay) * dx) / L; if (d > best){ best = d; bi = i; } }
+      if (best > tol){ dp(a, bi, out); dp(bi, b, out); } else out.push(pts[a]);
+    }
+    var far = 0, fd = 0;
+    pts.forEach(function(p, i){ var d = Math.hypot(p[0] - pts[0][0], p[1] - pts[0][1]); if (d > fd){ fd = d; far = i; } });
+    var out = []; dp(0, far, out); dp(far, pts.length, out); return out;
+  }
+  function buildDxf(){
+    var used = LAYERS.map(function(L){
+      var loops = [];
+      tools.forEach(function(t){ var r = rasterTool(t, L); if (r) loops.push.apply(loops, trace(r, t.x, t.y)); });
+      return { L:L, loops:loops };
+    }).filter(function(u){ return u.loops.length; }), o = [];
+    var engrLines = engr.strokes.filter(function(st){ return st.length > 1; }).map(function(st){ return st.map(function(q){ return [ex + q[0], ey + q[1]]; }); });
+    if (engrLines.length) used.push({ L:{ name:'ENGRAVE_D1.0', aci:7, open:true }, loops:engrLines });
+    function g(code, val){ o.push(code, val); }
+    function n(v){ return (Math.round(v * 1000) / 1000).toString(); }
+    g(0,'SECTION'); g(2,'HEADER'); g(9,'$ACADVER'); g(1,'AC1009'); g(9,'$INSUNITS'); g(70,4); g(0,'ENDSEC');
+    g(0,'SECTION'); g(2,'TABLES');
+    g(0,'TABLE'); g(2,'LTYPE'); g(70,1); g(0,'LTYPE'); g(2,'CONTINUOUS'); g(70,0); g(3,'Solid line'); g(72,65); g(73,0); g(40,0); g(0,'ENDTAB');
+    g(0,'TABLE'); g(2,'LAYER'); g(70,used.length);
+    used.forEach(function(u){ g(0,'LAYER'); g(2,u.L.name); g(70,0); g(62,u.L.aci); g(6,'CONTINUOUS'); });
+    g(0,'ENDTAB'); g(0,'ENDSEC');
+    g(0,'SECTION'); g(2,'ENTITIES');
+    used.forEach(function(u){
+      var name = u.L.name;
+      u.loops.forEach(function(loop){
+        g(0,'POLYLINE'); g(8,name); g(66,1); g(10,0); g(20,0); g(30,0); g(70,u.L.open ? 0 : 1);
+        loop.forEach(function(p){ g(0,'VERTEX'); g(8,name); g(10,n((p[0] - 20) / PX_MM)); g(20,n((440 - p[1]) / PX_MM)); g(30,0); });
+        g(0,'SEQEND'); g(8,name);
+      });
+    });
+    g(0,'ENDSEC'); g(0,'EOF');
+    return { text:o.join('\r\n') + '\r\n', layers:used.length };
+  }
+  exportBtn.addEventListener('click', function(){
+    var res = buildDxf(), base = (engrIn.value.trim() || 'Board A').replace(/[^\wÄÖÜäöüß\- ]+/g, '').trim().replace(/\s+/g, '_') || 'Board_A';
+    var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([res.text], { type:'application/dxf' })); a.download = base + '.dxf';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+    toast(a.download + ' heruntergeladen: Taschen 20 / 30 mm, Griffmulden 10 mm' + (engr.strokes.length ? ', Gravur 1 mm' : ''));
+  });
+  check();
+
+  /* ---------- Prozesskette: zehn Schritte, die zusammenfließen ---------- */
+  // Jeder Schritt: Text heute; je Ablauf (1 = erstes Board, 2 = weitere) 'k' bleibt, 'c' fällt weg (mit Grund), 'h' bleibt mit Hilfe.
+  var STEPS = [
+    { t:'Werkzeug fotografieren',          m:[null, ['h','auf dem Messbogen'], ['c','liegt in der Bibliothek']] },
+    { t:'Perspektive entzerren',           m:[null, ['c','automatisch'],       ['c','liegt in der Bibliothek']] },
+    { t:'Maßstab setzen',                  m:[null, ['c','automatisch'],       ['c','liegt in der Bibliothek']] },
+    { t:'Kontur nachzeichnen',             m:[null, ['c','automatisch'],       ['c','liegt in der Bibliothek']] },
+    { t:'Nachmessen und korrigieren',      m:[null, ['c','automatisch'],       ['c','liegt in der Bibliothek']] },
+    { t:'Tiefen und Griffmulden festlegen', m:[null, ['h','einmal je Werkzeug'], ['c','liegt in der Bibliothek']] },
+    { t:'Werkzeuge anordnen',              m:[null, ['h','automatisch anordnen'], ['h','automatisch anordnen']] },
+    { t:'Abstände prüfen',                 m:[null, ['c','prüft live'],        ['c','prüft live']] },
+    { t:'Tiefe je Tasche im CAM anlegen',  m:[null, ['h','eine Ebene je Tiefe'], ['h','eine Ebene je Tiefe']], svc:'Board bestellen' },
+    { t:'Fräsen',                          m:[null, ['k',''],                  ['k','']], svc:'Seiton Boards fräst' }
+  ];
+  var TIMES = [['6:00', 'h'], ['30', 'min'], ['10', 'min']];
+  var SAYS = [
+    '<b>Heute:</b> jedes Board von vorn – vom Foto bis zur Tiefe jeder einzelnen Tasche.',
+    '<b>Erstes Board:</b> Foto auf dem Messbogen, Dicken einmal angeben – Kontur, Maße und Prüfung macht Seiton.',
+    '<b>Jedes weitere Board:</b> Werkzeuge aus der Bibliothek ziehen, anordnen lassen, exportieren.'
+  ];
+  var chain = document.getElementById('chain'), noMill = document.getElementById('noMill');
+  var fCount = document.getElementById('fCount'), fTime = document.getElementById('fTime'), fSay = document.getElementById('fSay');
+  STEPS.forEach(function(s, i){
+    var li = document.createElement('li'); li.className = 'stp';
+    li.innerHTML = '<span class="no">' + String(i + 1).padStart(2, '0') + '</span><span class="lb"></span><span class="why"></span>';
+    chain.appendChild(li); s.li = li; s.lb = li.querySelector('.lb'); s.why = li.querySelector('.why');
+  });
+  var mode = 0, flowTimers = [];
+  function renderFlow(){
+    flowTimers.forEach(clearTimeout); flowTimers = [];
+    var svc = noMill.checked, n = 0;
+    STEPS.forEach(function(s, i){
+      var st = s.m[mode] ? s.m[mode][0] : 'k', why = s.m[mode] ? s.m[mode][1] : '', label = s.t, isNew = false;
+      if (svc && s.svc){
+        if (i === 9){ st = 'c'; why = 'wir fräsen für Sie'; }
+        else { label = s.svc; why = 'bei Seiton Boards'; st = 'h'; isNew = true; }
+      }
+      s.lb.textContent = label; s.why.textContent = why;
+      var li = s.li;
+      li.classList.toggle('new', isNew);
+      if (st === 'c'){
+        // renderFlow cancels all pending timers, so every cut step that is not gone yet needs a new one
+        var fresh = !li.classList.contains('cut');
+        li.classList.add('cut'); li.classList.remove('kept', 'help');
+        if (!li.classList.contains('gone')) flowTimers.push(setTimeout(function(){ li.classList.add('gone'); }, reduce ? 0 : (fresh ? 900 + i * 60 : 250)));
+      } else {
+        n++;
+        li.classList.remove('cut', 'gone');
+        li.classList.toggle('kept', mode > 0 && !isNew);
+        li.classList.toggle('help', st === 'h');
+      }
+    });
+    fCount.innerHTML = n + '<small>' + (n === 1 ? 'Schritt' : 'Schritte') + '</small>';
+    fTime.innerHTML = TIMES[mode][0] + '<small>' + TIMES[mode][1] + '</small>';
+    fSay.innerHTML = SAYS[mode] + ' <span class="est">geschätzt</span>';
+  }
+  var flowSeg = document.getElementById('flowSeg'), userTouched = false;
+  function setMode(m, btn){ mode = m; pressed(flowSeg, btn || flowSeg.querySelector('[data-m="' + m + '"]')); renderFlow(); }
+  flowSeg.addEventListener('click', function(e){ var b = e.target.closest('button'); if (!b) return; userTouched = true; setMode(+b.getAttribute('data-m'), b); });
+  noMill.addEventListener('change', function(){ userTouched = true; if (mode === 0) setMode(1); else renderFlow(); });
+  renderFlow();
+  onView(chain, function(){
+    if (reduce) return;
+    setTimeout(function(){ if (!userTouched) setMode(1); }, 1400);
+    setTimeout(function(){ if (!userTouched) setMode(2); }, 4600);
+  }, .25);
+
+  /* ---------- Digitalisierungs-Demo ---------- */
+  var stage = document.getElementById('digStage'), btn = document.getElementById('digBtn');
+  var steps = document.querySelectorAll('#digSteps li'), tNum = document.getElementById('tNum');
+  var timers = [], raf;
+  function setStep(i){ steps.forEach(function(li, k){ li.className = k < i ? 'done' : (k === i ? 'act' : ''); }); }
+  function runDig(){
+    timers.forEach(clearTimeout); timers = []; cancelAnimationFrame(raf);
+    stage.className = 'dig-stage'; void stage.offsetWidth; setStep(0); btn.disabled = true; btn.textContent = 'Läuft …';
+    var total = reduce ? 10 : 4400, t0 = performance.now();
+    (function tick(now){ var p = Math.min(1, (now - t0) / total); tNum.textContent = (p * 20).toFixed(1).replace('.', ','); if (p < 1) raf = requestAnimationFrame(tick); })(t0);
+    var seq = reduce ? [0,0,0,0,0] : [900, 1900, 3100, 4300, 4400];
+    timers.push(setTimeout(function(){ stage.classList.add('s1'); setStep(1); }, seq[0]));
+    timers.push(setTimeout(function(){ stage.classList.add('s2'); }, seq[1]));
+    timers.push(setTimeout(function(){ stage.classList.add('s3'); setStep(2); }, seq[2]));
+    timers.push(setTimeout(function(){ stage.classList.add('s4'); setStep(3); }, seq[3]));
+    timers.push(setTimeout(function(){ setStep(4); tNum.textContent = '20,0'; btn.disabled = false; btn.textContent = 'Nochmal digitalisieren'; }, seq[4]));
+  }
+  btn.addEventListener('click', runDig);
+  onView(stage, runDig, .55);
+  var WAYS = [
+    { p:'Messbogen ausdrucken, Werkzeug drauflegen, ein Foto von oben. Die Marker am Rand machen aus dem Foto ein maßhaltiges Abbild – ohne zusätzliche Hardware.',
+      li:['Bögen für A4, A3, Letter und Tabloid', 'Weiß oder schwarz – schwarz für blankes Metall', 'Foto mit Handy oder Kamera, auch mehrere auf einmal'] },
+    { p:'Die Aufnahmebox für Betriebe mit vielen Werkzeugen: Werkzeug hineinlegen, Knopf drücken. Kamera, Licht und Messfläche sind fest eingebaut.',
+      li:['Leuchtfläche von unten – scharfe Kontur auch bei blankem Metall', 'Gleiche Bedingungen bei jeder Aufnahme', 'Direkt in die Bibliothek'] },
+    { p:'Das Werkzeug gibt es schon digital? Dann übernehmen Sie es einfach – als DXF oder als Werkzeug-Datei von einem anderen Standort.',
+      li:['DXF-Kontur als Werkzeug einlesen', 'Werkzeug-Datei bringt Dicken und Griffmulden mit', 'Windows und Mac'] }
+  ];
+  var wayText = document.getElementById('wayText'), wayBtns = document.querySelectorAll('.way');
+  function showWay(i){
+    wayBtns.forEach(function(x, k){ x.classList.toggle('on', k === i); x.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+    wayText.innerHTML = '<p>' + WAYS[i].p + '</p><ul>' + WAYS[i].li.map(function(t){ return '<li>' + t + '</li>'; }).join('') + '</ul>';
+    wayText.classList.remove('swap-in'); void wayText.offsetWidth; if (!reduce) wayText.classList.add('swap-in');
+  }
+  wayBtns.forEach(function(w){ w.addEventListener('click', function(){ showWay(+w.getAttribute('data-w')); }); });
+  showWay(0);
+
+  /* ---------- Tiefe: gestufte Tasche in 3D (Schichten in CSS 3D) ---------- */
+  var obj = document.getElementById('obj'), scene = document.getElementById('scene');
+  var PX = 3, PLATE = 30, rx = 58, rz = -24, flat = false;
+  // Flächen in Tafel-Koordinaten (600 × 340); Tiefe in mm, 3 px je mm
+  var T3 = 'translate(52 170) scale(1.25) translate(-106 -191)';  // wrench outline (same as the digitizing demo) scaled onto the plate
+  var REG = [
+    { key:'head', color:D3, shapes:[['p','M106 174H140A17 17 0 0 1 140 208H106L114.8 227A44 44 0 0 0 181 207V175A44 44 0 0 0 114.8 155Z',T3],
+                                   ['p','M498 191A36 36 0 1 0 426 191A36 36 0 1 0 498 191ZM478 191A16 16 0 1 0 446 191A16 16 0 1 0 478 191Z',T3]] },
+    { key:'grip', color:D1, shapes:[['p','M176 174.9L433 177.1V204.9L176 207.1Z',T3]] },
+    { key:'rec',  color:A2, shapes:[['r',277,70,48,200,24]] }
+  ];
+  var depthMm = { head:14, grip:8, rec:20 };
+  function shape(g, s, attrs){
+    var a = {}; for (var k in attrs) a[k] = attrs[k];
+    if (s[0] === 'c'){ a.cx = s[1]; a.cy = s[2]; a.r = s[3]; return el('circle', a, g); }
+    if (s[0] === 'p'){ a.d = s[1]; a['fill-rule'] = 'evenodd'; if (s[2]) a.transform = s[2]; return el('path', a, g); }
+    a.x = s[1]; a.y = s[2]; a.width = s[3]; a.height = s[4]; a.rx = s[5]; return el('rect', a, g);
+  }
+  var maskN = 0;
+  // Group whose content is hidden where the given regions lie (their fills cut the layer)
+  function cutOut(sv, regions){
+    if (!regions.length) return sv;
+    var id = 'cut' + (++maskN), m = el('mask', { id:id, maskUnits:'userSpaceOnUse', x:-60, y:-60, width:720, height:460 }, el('defs', {}, sv));
+    el('rect', { x:-60, y:-60, width:720, height:460, fill:'#fff' }, m);
+    regions.forEach(function(r){ r.shapes.forEach(function(s){ shape(m, s, { fill:'#000' }); }); });
+    return el('g', { mask:'url(#' + id + ')' }, sv);
+  }
+  function layerSvg(z){ var s = el('svg', { viewBox:'0 0 600 340', width:600, height:340 }); s.style.transform = 'translateZ(' + z + 'px)'; obj.appendChild(s); return s; }
+  function buildPocket(){
+    obj.textContent = '';
+    var maxD = Math.max(depthMm.head, depthMm.grip, depthMm.rec);
+    // Plattenunterseite und Seitenwände der Platte
+    var bot = layerSvg(-PLATE * PX); el('rect', { x:0, y:0, width:600, height:340, rx:6, fill:'#12141c', stroke:'#2A2D3E', 'stroke-width':1.5 }, bot);
+    for (var z = PLATE - 3; z > 0; z -= 3){ var w = layerSvg(-z * PX); el('rect', { x:0, y:0, width:600, height:340, rx:6, fill:'none', stroke:'#2A2D3E', 'stroke-width':1.2 }, w); }
+    // Taschenböden, tiefster zuerst; tiefere Flächen sind aus dem Boden ausgespart
+    REG.slice().sort(function(a, b){ return depthMm[b.key] - depthMm[a.key]; }).forEach(function(r){
+      var f = layerSvg(-depthMm[r.key] * PX);
+      var g = cutOut(f, REG.filter(function(o){ return depthMm[o.key] > depthMm[r.key]; }));
+      r.shapes.forEach(function(s){ shape(g, s, { fill:r.color, 'fill-opacity':.92 }); });
+    });
+    // Taschenwände als Höhenlinien je 1,5 mm: nur der Umriss der Vereinigung, keine Linien innen
+    for (var d = maxD; d > 0; d -= 1.5){
+      var sl = layerSvg(-d * PX), act = REG.filter(function(r){ return depthMm[r.key] >= d; });
+      act.forEach(function(r){ var g = cutOut(sl, act.filter(function(o){ return o !== r; })); r.shapes.forEach(function(s){ shape(g, s, { fill:'none', stroke:r.color, 'stroke-width':1.6, 'stroke-opacity':.55 }); }); });
+    }
+    // Oberseite mit Loch (Maske) und Gravur
+    var top = layerSvg(0), mid = 'm' + Math.random().toString(36).slice(2, 7);
+    var mask = el('mask', { id:mid }, el('defs', {}, top));
+    el('rect', { x:0, y:0, width:600, height:340, fill:'#fff' }, mask);
+    REG.forEach(function(r){ r.shapes.forEach(function(s){ shape(mask, s, { fill:'#000' }); }); });
+    el('rect', { x:0, y:0, width:600, height:340, rx:6, fill:'#232737', stroke:'#3a3f55', 'stroke-width':2, mask:'url(#' + mid + ')' }, top);
+    REG.forEach(function(r){ var g = cutOut(top, REG.filter(function(o){ return o !== r; })); r.shapes.forEach(function(s){ shape(g, s, { fill:'none', stroke:'#E2E8F0', 'stroke-width':1.4, 'stroke-opacity':.8 }); }); });
+    var tx = el('text', { x:300, y:296, 'text-anchor':'middle', 'font-size':16, 'letter-spacing':4, fill:'none', stroke:'#94A3B8', 'stroke-width':.8, 'font-family':'Archivo, sans-serif' }, top);
+    tx.textContent = 'RING-MAULSCHLÜSSEL 17';
+  }
+  function view(){ obj.style.transform = flat ? 'rotateX(0deg) rotateZ(0deg) scale(.86)' : 'rotateX(' + rx + 'deg) rotateZ(' + rz + 'deg) scale(.86)'; }
+  function fit(){ obj.style.scale = Math.min(1, scene.clientWidth / 640); }
+  [['rHead','oHead','head'],['rGrip','oGrip','grip'],['rRec','oRec','rec']].forEach(function(a){
+    var r = document.getElementById(a[0]), o = document.getElementById(a[1]);
+    r.addEventListener('input', function(){ depthMm[a[2]] = +r.value; o.textContent = r.value + ' mm'; buildPocket(); });
+  });
+  var v3 = document.getElementById('v3d'), v2 = document.getElementById('v2d');
+  v3.addEventListener('click', function(){ flat = false; pressed(v3.parentNode, v3); view(); });
+  v2.addEventListener('click', function(){ flat = true; pressed(v2.parentNode, v2); view(); });
+  var drag = null;
+  scene.addEventListener('pointerdown', function(e){ if (e.target.closest('button')) return; drag = { x:e.clientX, y:e.clientY, rx:rx, rz:rz }; scene.setPointerCapture(e.pointerId); scene.classList.add('live', 'grab'); if (flat){ flat = false; pressed(v3.parentNode, v3); } });
+  scene.addEventListener('pointermove', function(e){ if (!drag) return; rz = drag.rz + (e.clientX - drag.x) * .4; rx = clamp(drag.rx - (e.clientY - drag.y) * .3, 0, 78); view(); });
+  function up(){ drag = null; scene.classList.remove('live', 'grab'); }
+  scene.addEventListener('pointerup', up); scene.addEventListener('pointercancel', up);
+  buildPocket(); fit(); window.addEventListener('resize', fit);
+  obj.style.transform = 'rotateX(0deg) rotateZ(0deg) scale(.86)';
+  onView(scene, function(){ setTimeout(view, reduce ? 0 : 250); }, .4);
+
+  /* ---------- Bibliothek: Kacheln mit denselben Zeichnungen ---------- */
+  document.querySelectorAll('#tiles .th[data-t]').forEach(function(th){
+    var d = TOOLS[th.getAttribute('data-t')], rot = d.h > d.w, W = rot ? d.h : d.w, H = rot ? d.w : d.h, k = Math.min(184 / W, 68 / H);
+    var sv = el('svg',{viewBox:'0 0 200 80',width:170,'aria-hidden':'true'}, th);
+    d.draw(el('g',{transform:'translate(100 40)' + (rot ? ' rotate(-90)' : '') + ' scale(' + k + ') translate(' + (-d.w / 2) + ' ' + (-d.h / 2) + ')'}, sv));
+  });
+
+  /* ---------- Bibliothek-Suche ---------- */
+  var input = document.getElementById('libSearch'), tiles = document.querySelectorAll('#tiles .tile');
+  var countEl = document.getElementById('libCount'), empty = document.getElementById('libEmpty'), proj = '';
+  function filter(){
+    var q = input.value.trim().toLowerCase(), n = 0;
+    tiles.forEach(function(t){ var s = t.getAttribute('data-s'); var show = (!q || s.indexOf(q) > -1) && (!proj || s.indexOf(proj) > -1); t.hidden = !show; if (show) n++; });
+    countEl.textContent = n + (n === 1 ? ' Werkzeug' : ' Werkzeuge');
+    empty.style.display = n ? 'none' : 'block';
+  }
+  input.addEventListener('input', filter);
+  document.querySelectorAll('.chipf').forEach(function(c){
+    c.addEventListener('click', function(){ document.querySelectorAll('.chipf').forEach(function(x){ x.classList.remove('on'); }); c.classList.add('on'); proj = c.getAttribute('data-f'); filter(); });
+  });
+
+  /* ---------- Änderungen: 12 Boards mit Referenz ---------- */
+  var minis = document.getElementById('minis'), boards = [];
+  var others = [
+    function(g){ el('rect',{x:20,y:62,width:70,height:14,rx:6,fill:D2},g); },
+    function(g){ el('rect',{x:126,y:22,width:14,height:60,rx:6,fill:D3},g); },
+    function(g){ el('circle',{cx:40,cy:70,r:12,fill:D3},g); el('rect',{x:60,y:64,width:60,height:10,rx:4,fill:D3},g); },
+    function(g){ el('path',{d:'M126 22 L126 76 L140 76',fill:'none',stroke:D1,'stroke-width':6,'stroke-linecap':'round'},g); }
+  ];
+  for (var i = 0; i < 12; i++){
+    var d = document.createElement('div'); d.className = 'mini';
+    d.innerHTML = '<div class="lbl"><span>Board ' + String.fromCharCode(65 + i) + '</span><span>v1</span></div>';
+    var s = el('svg',{viewBox:'0 0 150 96',width:'100%'}); s.setAttribute('aria-hidden','true');
+    el('rect',{width:150,height:96,rx:4,fill:'#0F1117'},s);
+    var wr = el('g',{'class':'wr'},s);
+    var h = el('rect',{x:24,y:22,width:70,height:9,rx:4.5,fill:D1},wr);
+    var c1 = el('circle',{cx:24,cy:26.5,r:10,fill:D1},wr);
+    var c2 = el('circle',{cx:95,cy:26.5,r:8,fill:D1},wr);
+    el('rect',{x:12,y:23,width:13,height:7,rx:2,fill:'#0F1117'},wr);
+    var ho = el('circle',{cx:95,cy:26.5,r:3.4,fill:'#0F1117'},wr);
+    others[i % 4](s);
+    d.appendChild(s); minis.appendChild(d);
+    boards.push({ el:d, h:h, c1:c1, c2:c2, ho:ho, lbl:d.querySelector('.lbl span:last-child') });
+  }
+  function setV(b, v2){
+    b.h.setAttribute('width', v2 ? 82 : 70); b.c2.setAttribute('cx', v2 ? 107 : 95); b.c2.setAttribute('r', v2 ? 9 : 8); b.ho.setAttribute('cx', v2 ? 107 : 95);
+    [b.h,b.c1,b.c2].forEach(function(x){ x.setAttribute('fill', v2 ? A2 : D1); });
+    b.lbl.textContent = v2 ? 'v2' : 'v1';
+    b.el.classList.remove('flash'); void b.el.offsetWidth; if (v2) b.el.classList.add('flash');
+  }
+  var dlg = document.getElementById('dlg');
+  document.getElementById('editTool').addEventListener('click', function(){ dlg.classList.add('open'); dlg.querySelector('[data-a="save"]').focus(); });
+  dlg.addEventListener('click', function(e){
+    var a = e.target.closest('[data-a]'); if (!a) return; var act = a.getAttribute('data-a'); dlg.classList.remove('open');
+    if (act === 'save'){ boards.forEach(function(b, k){ setTimeout(function(){ setV(b, true); }, reduce ? 0 : k * 70); }); toast('Gespeichert: 12 Boards aktualisiert'); }
+    if (act === 'copy'){ var b = boards[0]; setV(b, true); if (!b.el.querySelector('.var')){ var v = document.createElement('span'); v.className = 'var'; v.textContent = 'Kopie'; b.el.appendChild(v); } toast('Als Kopie gespeichert – Board A nutzt die Kopie'); }
+  });
+  document.getElementById('resetBoards').addEventListener('click', function(){ boards.forEach(function(b){ setV(b, false); var v = b.el.querySelector('.var'); if (v) v.remove(); }); dlg.classList.remove('open'); });
+
+  /* ---------- Fräsen: eigene Fräse oder Seiton Boards ---------- */
+  var millSeg = document.getElementById('millSeg'), otrack = document.querySelectorAll('#otrack li'), oT = [];
+  millSeg.addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (!b) return; pressed(millSeg, b);
+    var svc = b.getAttribute('data-k') === 'svc';
+    ['clOwn','pnOwn'].forEach(function(id){ document.getElementById(id).classList.toggle('off', svc); });
+    ['clSvc','pnSvc'].forEach(function(id){ document.getElementById(id).classList.toggle('off', !svc); });
+    oT.forEach(clearTimeout); oT = []; otrack.forEach(function(li){ li.classList.remove('done'); });
+    if (svc) otrack.forEach(function(li, k){ oT.push(setTimeout(function(){ li.classList.add('done'); }, reduce ? 0 : 350 + k * 450)); });
+  });
+
+  /* ---------- Zeit-Zähler ---------- */
+  var clock = document.getElementById('clockNew'), clockN = document.getElementById('clockNext'), timeBox = document.getElementById('timeBox');
+  function fmt(min){ if (min < 59.5) return Math.round(min) + ' min'; var h = Math.floor(min / 60), m = Math.round(min % 60); if (m === 60){ h++; m = 0; } return h + ':' + (m < 10 ? '0' : '') + m + ' h'; }
+  function count(elm, to, dur){
+    if (reduce){ elm.textContent = fmt(to); return; }
+    var t0 = performance.now();
+    (function tick(now){ var p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3); elm.textContent = fmt(360 - (360 - to) * e); if (p < 1) requestAnimationFrame(tick); })(t0);
+  }
+  onView(timeBox, function(){ count(clock, 30, 1800); setTimeout(function(){ count(clockN, 10, 1800); }, reduce ? 0 : 500); });
+
+  /* ---------- Seiton: vier Teile auf der Kette ---------- */
+  var railSpans = document.querySelectorAll('#famRail span');
+  function lightRail(parts){ railSpans.forEach(function(s){ s.classList.toggle('hl', parts.indexOf(s.getAttribute('data-p')) > -1); }); }
+  document.querySelectorAll('#fam .card').forEach(function(c){
+    var parts = c.getAttribute('data-p').split(' ');
+    c.addEventListener('mouseenter', function(){ lightRail(parts); });
+    c.addEventListener('focus', function(){ lightRail(parts); });
+    c.addEventListener('click', function(){ lightRail(parts); });
+    c.addEventListener('mouseleave', function(){ lightRail([]); });
+  });
+
+  /* ---------- Aktiver Reiter in der Kopfleiste ---------- */
+  var tabs = document.querySelectorAll('.tabs a');
+  var secs = Array.prototype.map.call(tabs, function(a){ return document.querySelector(a.getAttribute('href')); });
+  var tabIO = new IntersectionObserver(function(ents){
+    ents.forEach(function(en){ if (en.isIntersecting){ tabs.forEach(function(a, k){ a.classList.toggle('on', secs[k] === en.target); }); } });
+  }, { rootMargin: '-45% 0px -50% 0px' });
+  secs.forEach(function(sct){ if (sct) tabIO.observe(sct); });
+})();
+</script>
+</body>
+</html>
